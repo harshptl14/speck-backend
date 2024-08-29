@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  // binaryTargets = ["native", "linux-arm64-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Define the area of study table
+model AreaOfStudy {
+  area_id Int     @id @default(autoincrement())
+  name    String
+  // description String
+  levels  Level[]
+  Topic   Topic[]
+}
+
+// Define the Levels table
+model Level {
+  level_id      Int         @id @default(autoincrement())
+  name          String
+  description   String
+  order         Int
+  topics        Topic[]
+  areaOfStudy   AreaOfStudy @relation(fields: [areaOfStudyId], references: [area_id])
+  areaOfStudyId Int
+}
+
+// Define the Topics table
+model Topic {
+  topic_id      Int         @id @default(autoincrement())
+  name          String
+  description   String
+  order         Int
+  level         Level       @relation(fields: [level_id], references: [level_id])
+  level_id      Int
+  areaOfStudy   AreaOfStudy @relation(fields: [areaOfStudyId], references: [area_id])
+  areaOfStudyId Int
+  subtopics     Subtopic[]
+}
+
+// Define the Subtopics table
+model Subtopic {
+  subtopic_id Int       @id @default(autoincrement())
+  name        String
+  description String
+  order       Int
+  topic       Topic     @relation(fields: [topic_id], references: [topic_id])
+  topic_id    Int
+  concepts    Concept[]
+}
+
+// Define the Concepts table with content entries
+model Concept {
+  concept_id     Int            @id @default(autoincrement())
+  name           String
+  description    String
+  order          Int
+  subtopic       Subtopic       @relation(fields: [subtopic_id], references: [subtopic_id])
+  subtopic_id    Int
+  contentEntries ContentEntry[]
+}
+
+// Define the ContentEntries table
+model ContentEntry {
+  entry_id    Int         @id @default(autoincrement())
+  concept     Concept     @relation(fields: [concept_id], references: [concept_id])
+  concept_id  Int
+  contentType ContentType // Enum to specify the type of content (e.g., Video, Article, Text)
+  content     String // Content can be a link or text based on contentType
+}
+
+// Enum for ContentType
+enum ContentType {
+  VIDEO
+  ARTICLE
+  TEXT
+  IMAGE
+  // Add more types as needed
+}

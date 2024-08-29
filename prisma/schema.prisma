@@ -1,0 +1,152 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        Int        @id @default(autoincrement())
+  email     String     @unique
+  name      String
+  roadmaps  Roadmap[]  @relation("UserRoadmaps")
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  Progress  Progress[]
+
+  @@index([email])
+}
+
+model Roadmap {
+  id          Int        @id @default(autoincrement())
+  name        String
+  description String?
+  markdown    String?
+  userId      Int
+  user        User       @relation("UserRoadmaps", fields: [userId], references: [id], onDelete: Cascade)
+  topics      Topic[]
+  progress    Progress[] @relation("RoadmapProgress")
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@unique([userId, name])
+}
+
+model Topic {
+  id            Int            @id @default(autoincrement())
+  name          String
+  description   String?
+  order         Int
+  roadmapId     Int
+  roadmap       Roadmap        @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  subtopics     Subtopic[]
+  videoContents VideoContent[]
+  textContents  TextContent[]
+  progress      Progress[]     @relation("TopicProgress")
+  markdown      String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@unique([roadmapId, name])
+}
+
+model Subtopic {
+  id            Int            @id @default(autoincrement())
+  name          String
+  description   String?
+  order         Int
+  topicId       Int
+  topic         Topic          @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  content       Content[]
+  videoContents VideoContent[]
+  textContents  TextContent[]
+  progress      Progress[]     @relation("SubtopicProgress")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@unique([topicId, name])
+}
+
+model VideoContent {
+  id         Int       @id @default(autoincrement())
+  topicId    Int
+  topic      Topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  subtopicId Int
+  subtopic   Subtopic  @relation(fields: [subtopicId], references: [id], onDelete: Cascade)
+  name       String
+  thumbnail  String?
+  duration   Int // Duration in seconds
+  link       String
+  transcript String? // Optional transcript
+  summary    String? // Optional summary
+  videoType  VideoType
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([topicId, subtopicId])
+}
+
+model TextContent {
+  id         Int      @id @default(autoincrement())
+  topicId    Int
+  topic      Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  subtopicId Int
+  subtopic   Subtopic @relation(fields: [subtopicId], references: [id], onDelete: Cascade)
+  title      String
+  content    String
+  link       String? // Optional link to external resource
+  summary    String? // Optional summary of the content
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([topicId, subtopicId])
+}
+
+enum VideoType {
+  VIDEO
+  SHORTS
+  CUSTOM
+}
+
+model Content {
+  id         Int         @id @default(autoincrement())
+  title      String
+  type       ContentType
+  url        String?
+  markdown   String?
+  subtopicId Int
+  subtopic   Subtopic    @relation(fields: [subtopicId], references: [id], onDelete: Cascade)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model Progress {
+  id         Int            @id @default(autoincrement())
+  userId     Int
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roadmapId  Int
+  roadmap    Roadmap        @relation("RoadmapProgress", fields: [roadmapId], references: [id], onDelete: Cascade)
+  topicId    Int?
+  topic      Topic?         @relation("TopicProgress", fields: [topicId], references: [id], onDelete: SetNull)
+  subtopicId Int?
+  subtopic   Subtopic?      @relation("SubtopicProgress", fields: [subtopicId], references: [id], onDelete: SetNull)
+  status     ProgressStatus
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  @@unique([userId, roadmapId, topicId, subtopicId])
+}
+
+enum ContentType {
+  YOUTUBE
+  ARTICLE
+  MARKDOWN
+}
+
+enum ProgressStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}

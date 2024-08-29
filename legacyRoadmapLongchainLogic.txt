@@ -1,0 +1,241 @@
+import { groqModel } from "../../configs/longchain.config";
+import { ChatPromptTemplate, PromptTemplate } from "@langchain/core/prompts";
+import { availaleRoadmapInDB } from "./topicExist.service";
+import { PrismaClient } from "@prisma/client";
+import { RunnableLambda, RunnablePassthrough, RunnableSequence } from "@langchain/core/runnables";
+import { StringOutputParser } from "@langchain/core/output_parsers";
+import { JsonOutputFunctionsParser } from "langchain/output_parsers";
+import z from "zod";
+import { insertJsonToPrisma } from "./llmToDB";
+
+// const subtopicSchema = z.object({
+//   name: z.string().describe("The name of the subtopic"),
+//   description: z.string().describe("A brief description of the subtopic"),
+//   order: z.number().int().describe("The order of the subtopic within its parent topic")
+// });
+
+// const topicSchema = z.object({
+//   name: z.string().describe("The name of the topic"),
+//   description: z.string().describe("A brief description of the topic"),
+//   order: z.number().int().describe("The order of the topic within the roadmap"),
+//   subtopics: z.array(subtopicSchema).describe("A list of subtopics under this topic")
+// });
+
+// const roadmapSchema = z.object({
+//   topics: z.array(topicSchema).describe("A list of topics in the roadmap")
+// });
+
+// const anythingLearningSchema = z.object({
+//     topic: z.string().optional(),
+//     levels: z.array(
+//         z.object({
+//             name: z.string().optional(),
+//             description: z.string().optional(),
+//             order: z.number().int().positive(),
+//             topics: z.array(
+//                 z.object({
+//                     name: z.string().optional(),
+//                     description: z.string().optional(),
+//                     order: z.number().int().positive(),
+//                     subtopics: z.array(
+//                         z.object({
+//                             name: z.string().optional(),
+//                             description: z.string().optional(),
+//                             order: z.number().int().positive(),
+//                             concepts: z.array(
+//                                 z.object({
+//                                     name: z.string().optional(),
+//                                     description: z.string().optional(),
+//                                     order: z.number().int().positive(),
+//                                     contentEntries: z.array(
+//                                         z.object({
+//                                             contentType: z.enum(["TEXT"]),
+//                                             content: z.string().optional(),
+//                                         })
+//                                     ),
+//                                 })
+//                             ),
+//                         })
+//                     ),
+//                 })
+//             ),
+//         })
+//     ),
+// });
+const dataFromDb = async (userQuery: string) => {
+  const prisma = new PrismaClient();
+  try {
+    const topicData = await prisma.roadmap.findFirst({
+      where: {
+        name: userQuery
+      }
+    });
+    return topicData;
+  }
+  catch (error) {
+    console.error("An error occurred:", error);
+    return null;
+  }
+  finally {
+    prisma.$disconnect();
+  }
+}
+
+export const createRoadmapFunction = async (userQuery: string): Promise<string> => {
+  try {
+    // const SYSTEM_PROMPT = `You are the best roadmap creator in the world! Let's create a learning roadmap for mastering the topic which user provides.`;
+    // const USER_PROMPT = `Create a comprehensive learning roadmap for mastering {userQuery} from beginner to advanced level. Your task includes:
+
+    // Break down the main topic into major subtopics and key concepts, ensuring complete coverage of the field.
+    // Organize the content into a logical, progressive learning sequence, from foundational knowledge to advanced applications.
+    // For each subtopic:
+    // a. List the core concepts to be learned.
+    // b. Outline the key skills to be developed.
+    // c. Briefly describe the expected learning outcomes.
+    // Structure the roadmap in a clear, hierarchical format (e.g., main topics, subtopics, key points) for easy navigation and understanding.
+    // Include milestones or checkpoints throughout the roadmap to help learners assess their progress.
+    // Suggest how different subtopics interconnect or build upon each other, promoting a holistic understanding of the subject.
+    // Indicate the relative complexity or difficulty level of each major section (e.g., beginner, intermediate, advanced).
+    // Conclude with a brief overview of how mastery of this roadmap would position a learner in the field.
+    // Please provide the details in the following JSON format to create a structured learning roadmap suitable for populating a database:
+
+    // {{
+    //   "topic": "{userQuery}",
+    //   "levels": [
+    //     {{
+    //       "name": "Beginner",
+    //       "description": "Foundational knowledge and skills",
+    //       "order": 1,
+    //       "topics": [
+    //         {{
+    //           "name": "Basic Concepts",
+    //           "description": "Core concepts and fundamentals",
+    //           "order": 1,
+    //           "subtopics": [
+    //             {{
+    //               "name": "Introduction",
+    //               "description": "Understanding core principles",
+    //               "order": 1,
+    //               "concepts": [
+    //                 {{
+    //                   "name": "Fundamental Concept",
+    //                   "description": "Overview of a key concept",
+    //                   "order": 1,
+    //                   "contentEntries": [
+    //                     {{
+    //                       "contentType": "TEXT",
+    //                       "content": "Brief description of the concept"
+    //                     }}
+    //                   ]
+    //                 }}
+    //               ]
+    //             }}
+    //           ]
+    //         }}
+    //       ]
+    //     }}
+    //   ]
+    // }}
+
+    // Give me only json, without any other text, just JSON.`;
+    const roadmapPrompt = PromptTemplate.fromTemplate(`
+    Create a comprehensive learning roadmap for mastering {userQuery}. Your task includes topics and subtopics. Follow below JSON format:
+    {{
+          "topics": [
+            {{
+              "name": "Basic Concepts",
+              "description": "Core concepts and fundamentals",
+              "order": 1,
+              "subtopics": [
+                {{
+                  "name": "Introduction",
+                  "description": "Understanding core principles",
+                  "order": 1,
+                }}
+              ]
+            }}
+          ]
+    }}
+
+    Give me only json, without any other text, just JSON.
+    `);
+
+
+    // const prompt = ChatPromptTemplate.fromMessages([
+    //   ["system", SYSTEM_PROMPT],
+    //   ["human", USER_PROMPT],
+    // ]);
+
+    // const chain = prompt.pipe(groqModel);
+
+    // const response = await chain.invoke({
+    //   userQuery
+    // });
+
+    // console.log("Response:", response);
+
+
+    const markdownInfoPrompt = ChatPromptTemplate.fromTemplate(
+      `You need to do two things, and put them in a JSON format with two keys, markdownRoadmap and courseInfo. Do not give me any reponse other than this JSON\n
+      1. For markdownRoadmap key: Use only this {roadmap}, and just convert it into Markdown format. Don't change or add content by yourself?,
+      \n
+      2. For courseInfo key: Provide a information about this in Markdown format. Make it little discriptive and informative about this course, what it is about and what it will cover.
+      \n
+    `);
+
+    const chain = roadmapPrompt.pipe(groqModel).pipe(new StringOutputParser());
+
+    const response = await chain.invoke({
+      userQuery: userQuery
+    });
+
+    const combinedChain = RunnableSequence.from([
+      {
+        roadmap: chain,
+        // language: new RunnablePassthrough()
+      },
+      markdownInfoPrompt,
+      groqModel,
+      new StringOutputParser()
+    ]);
+
+    const combinedResponse = await combinedChain.invoke({
+      userQuery: userQuery
+    });
+
+    console.log("Combined Response:", combinedResponse);
+
+
+    insertJsonToPrisma(
+      JSON.parse(response),
+      1,
+      userQuery
+    )
+
+    return JSON.stringify(response) || "";
+
+
+
+    // const topicExistInDB = await topicExist(userQuery);
+    // if (topicExistInDB) {
+    //   // get the data from the database
+    //   console.log("Topic exists in DB...using the same one");
+    //   const topicData = await dataFromDb(userQuery);
+    //   console.log("Data from DB:", topicData);
+    //   return JSON.stringify(topicData) || "";
+    // }
+    // else {
+    //   console.log("Creating new roadmap...");
+    //   const response = await chain.invoke({
+    //     userQuery
+    //   });
+
+    //   createReactCurriculum(response?.content);
+
+    //   return JSON.stringify(response?.content) || "";
+    // }
+  } catch (error) {
+    console.error("An error occurred:", error);
+    return "";
+  }
+};
