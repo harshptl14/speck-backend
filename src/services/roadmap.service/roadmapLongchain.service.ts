@@ -6,7 +6,7 @@ import { StringOutputParser } from "@langchain/core/output_parsers";
 import { insertJsonToPrisma } from "./llmToDB";
 import { populateFirstRoadmapTopic } from "./contentScrap.service";
 
-export const createRoadmapFunction = async (userQuery: string): Promise<string> => {
+export const createRoadmapFunction = async (userQuery: string, userId: number): Promise<{} | Error> => {
   try {
     const roadmapPrompt = PromptTemplate.fromTemplate(`
 Create a comprehensive learning roadmap for mastering {userQuery}. Your task includes topics and subtopics. Respond with a JSON object only, using the following structure:
@@ -37,27 +37,97 @@ Important:
 `);
 
     const markdownInfoPrompt = ChatPromptTemplate.fromTemplate(
-      `You need to do two things and put them in a JSON format with two keys: markdownRoadmap and courseInfo. Your response must be a complete, valid JSON object without any additional text, markdown formatting, or code blocks. Do not use backticks or any other formatting outside the JSON structure.
+      `Your task is to create a JSON object with two keys: "markdownRoadmap" and "courseInfo". Follow these instructions carefully:
 
-1. For markdownRoadmap key: Use only the provided {roadmap}, and convert it into Markdown format. Don't change or add content by yourself.
-
-2. For courseInfo key: Provide information about this course in Markdown format. Make it descriptive and informative about what the course is about and what it will cover.
-
-Your response must be a single, complete JSON object in this exact format:
-{{
-  "markdownRoadmap": "Your markdown roadmap here",
-  "courseInfo": "Your course information here"
+1. For the "markdownRoadmap" key:
+    - Use the content provided within {roadmap} brackets.
+    You will have this type of content:
+    {{
+  "topics": [
+    {{
+      "name": "Topic Name",
+      "description": "Brief description of the topic",
+      "order": 1,
+      "subtopics": [
+        {{
+          "name": "Subtopic Name",
+          "description": "Brief description of the subtopic",
+          "order": 1
+        }}
+      ]
+    }}
+  ]
 }}
 
-Important: 
-1. Provide only valid JSON in your response.
-2. Do not include any text, comments, or explanations outside the JSON structure.
-3. Do not use backticks, markdown formatting, or code blocks.
-4. Ensure all JSON keys and values are properly quoted.
-5. The response should start with '{{' and end with '}}'.`
+    - use topics and subtopics to create a Markdown-formatted roadmap.
+    - use the "name" key as the topic name and the "subtopics" key as the subtopic name.
+    - Add Description to the subtopics.
+    - Do not include any additional information, use only the content provided within {roadmap} brackets.
+    - Convert this content into the following Markdown format:
+        
+        "
+        ---
+        title: Give roadmap a title
+        markmap:
+          colorFreezeLevel: 2
+        ---
+        ## Topic Name
+        1. Subtopic Name 1 (Description)
+        2. Subtopic Name 2 (Description)
+        3. Subtopic Name 3 (Description)
+        4. Subtopic Name 4 (Description)
+        5. Subtopic Name 5 (Description)
+
+        "
+        
+    - Each topic should be a heading (using #), followed by a numbered list of 3-5 subtopics.
+    - Do not include descriptions or any additional information.
+    - Do not alter or add any content beyond what's given in the {roadmap}.
+2. For the "courseInfo" key:
+    - Provide a concise description of the course as a single string (not in Markdown format).
+    - Include information about what the course covers and its objectives.
+
+Important guidelines:
+
+- Your entire response must be a single, valid JSON object.
+- Do not include any text, comments, or explanations outside the JSON structure.
+- Do not use backticks, code blocks, or any formatting beyond what's required for JSON.
+- Ensure all JSON keys and values are correctly quoted.
+- The response should begin with '{{' and end with '}}'.
+
+Use this exact format for your response:
+{{
+"markdownRoadmap": "Your Markdown roadmap here",
+"courseInfo": "Your course information here as a single string"
+}}
+
+Remember:
+
+- Provide only valid JSON in your response.
+- The content inside "markdownRoadmap" should be Markdown-formatted text.
+- The content inside "courseInfo" should be a plain text string without Markdown formatting.
+- Do not add any additional formatting or explanations outside the JSON object.`
     );
 
-    const isRoadmapAvailable = await availaleRoadmapInDB(userQuery);
+    const RoadmapInfoPrompt = ChatPromptTemplate.fromTemplate(
+      `
+       You are an expert course curator. Using the following {markdown} content as a reference, create a clear, descriptive overview of what the course roadmap entails. Present the information in a way that is easy to understand and organized
+       into well-structured paragraphs. Ensure the overview is engaging and highlights the course's structure, objectives, and key benefits to the learners. The tone should be informative and approachable, with the length of the content ranging
+       between 150-250 words, formatted into clear paragraphs for better readability.
+
+       Output only the courseInfo description.
+      `);
+
+    const RoadmapNamePropmt = ChatPromptTemplate.fromTemplate(
+      `
+      You are an expert course curator. Based on {userQuery}, generate a compelling and concise name for the roadmap that captures the essence of the course or learning journey. 
+      The name should be clear, engaging, and relevant to the topic, reflecting the core objective of the roadmap. Keep the name concise, typically within 3-6 words.
+      
+      Output only the name, without any additional text or formatting.
+      `
+    );
+
+    const isRoadmapAvailable = await availaleRoadmapInDB(userQuery, userId);
 
     if (Object.keys(isRoadmapAvailable).length !== 0) {
       // User query is already available in the database
@@ -70,7 +140,7 @@ Important:
         roadmap: isRoadmapAvailable
       }
 
-      return `${JSON.stringify(returnJsonOjbect)}` || "";
+      return returnJsonOjbect || {};
       // Ask the user if they still want to create a new roadmap
       // TODO: Implement user confirmation logic
     } else {
@@ -84,90 +154,98 @@ Important:
         userQuery: userQuery
       });
 
-      const combinedChain = RunnableSequence.from([
-        {
-          roadmap: chain,
-          // language: new RunnablePassthrough()
-        },
-        markdownInfoPrompt,
-        groqModel,
-        new StringOutputParser()
-      ]);
+      // const combinedChain = RunnableSequence.from([
+      //   {
+      //     roadmap: chain,
+      //     // language: new RunnablePassthrough()
+      //   },
+      //   markdownInfoPrompt,
+      //   groqModel,
+      //   new StringOutputParser()
+      // ]);
 
-      const combinedResponse = await combinedChain.invoke({
-        userQuery: userQuery
-      });
+      // const combinedResponse = await combinedChain.invoke({
+      //   userQuery: userQuery
+      // });
 
       console.log("Response:", response);
 
+      const markdown = jsonToMarkdown(JSON.parse(response));
+      const courseInfoChain = RoadmapInfoPrompt.pipe(groqModel).pipe(new StringOutputParser());
+
+      const courseInfoResponse = await courseInfoChain.invoke({
+        markdown: markdown
+      });
+
+      // create a object, which combines courseInfoResponse and markdown
+      const combinedResponse = {
+        markdownRoadmap: markdown,
+        courseInfo: courseInfoResponse
+      };
+
+      const courseNameChain = RoadmapNamePropmt.pipe(groqModel).pipe(new StringOutputParser());
+
+      const courseNameResponse = await courseNameChain.invoke({
+        userQuery: userQuery
+      });
+
       console.log("Combined Response:", combinedResponse);
 
-      // let passedRoadmapRes = "";
-      // let passedRoadmapMetadata = "";
-      // try {
-      //   // Remove any potential leading/trailing whitespace or non-JSON characters
-      //   const cleanedResult = response.trim().replace(/^[^{]*/, '').replace(/[^}]*$/, '');
-
-      //   // Remove any invisible characters and escape newlines
-      //   const sanitizedResult = cleanedResult
-      //     .replace(/[\u0000-\u001F]+/g, '')
-      //     .replace(/\n/g, '\\n')
-      //     .replace(/\r/g, '\\r')
-      //     .replace(/\t/g, '\\t');
-
-      //   passedRoadmapRes = JSON.parse(sanitizedResult);
-      // } catch (error) {
-      //   console.error("Failed to parse JSON response:", response);
-      //   throw new Error("Invalid response format from language model");
-      // }
-
-      // try {
-      //   // Remove any potential leading/trailing whitespace or non-JSON characters
-      //   const cleanedResult = combinedResponse.trim().replace(/^[^{]*/, '').replace(/[^}]*$/, '');
-
-      //   // Remove any invisible characters and escape newlines
-      //   const sanitizedResult = cleanedResult
-      //     .replace(/[\u0000-\u001F]+/g, '')
-      //     .replace(/\n/g, '\\n')
-      //     .replace(/\r/g, '\\r')
-      //     .replace(/\t/g, '\\t');
-
-      //   passedRoadmapMetadata = JSON.parse(sanitizedResult);
-      // } catch (error) {
-      //   console.error("Failed to parse JSON response:", response);
-      //   throw new Error("Invalid response format from language model");
-      // }
-
-      // console.log("Roadmap:", passedRoadmapRes);
-      // console.log("Metadata:", passedRoadmapMetadata);
+      console.log("roadmap name, prompt", courseNameResponse);
 
       // Insert the JSON data into the database
       const roadmapid = await insertJsonToPrisma(
         JSON.parse(response),
-        JSON.parse(combinedResponse),
-        1,
-        userQuery
+        combinedResponse,
+        userId,
+        courseNameResponse
       );
-
-      // Use the JSON data, and collect and store the content for first 1 object in the DB
-
-      // Function to extract the first object from the JSON data
-
-      // loop through that first object and find contnet
-
-      // Do processing on the content(transcribe and creating course contnet for each topic and subtopic using LLM)
-
-      // Store the content in the DB
 
       console.log("roadmap Created and inserted into the database, now getting content for the first topic");
 
       await populateFirstRoadmapTopic(roadmapid);
 
-      return JSON.stringify(response) || "";
+      return { message: "Roadmap Created Successfully" };
 
     }
   } catch (error) {
     console.error("An error occurred in roadmapLangChain:", error);
-    return "";
+    throw new Error("An error occurred while creating the roadmap");
   }
 };
+
+
+type subtopics = {
+  name: string;
+  description: string;
+  order: number;
+};
+
+type topics = {
+  name: string;
+  description: string;
+  order: number;
+  subtopics: subtopics[];
+};
+
+function jsonToMarkdown(json: { topics: topics[] }) {
+  let markdown = '';
+
+  const parseTopics = (topics: topics[]) => {
+    topics.forEach(topic => {
+      markdown += `# ${topic.name}\n\n`;  // Topic name as a header
+      if (topic.subtopics && topic.subtopics.length > 0) {
+        topic.subtopics.forEach(subtopic => {
+          markdown += `- ${subtopic.name} (${subtopic.description})\n`;  // Subtopic with description in parentheses
+        });
+      }
+      markdown += `\n`;
+    });
+  };
+
+  if (json.topics && json.topics.length > 0) {
+    parseTopics(json.topics);
+  }
+
+  return markdown;
+}
