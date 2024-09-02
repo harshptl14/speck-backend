@@ -1,15 +1,22 @@
 import { Request, Response } from 'express';
-import { getResponse } from '../services/roadmap.service/roadmap.service';
+import { createRoadmapService } from '../services/roadmap.service/roadmap.service';
 import { createRoadmapFunction } from '../services/roadmap.service/roadmapLongchain.service';
 import { getRoadmapTitleService } from '../services/roadmap.service/getRoadmapTitle.service';
-import { getUserRoadmaps } from '../services/roadmap.service/userRoadmaps.service';
+import { getRoadmapByIdService, getUserRoadmaps } from '../services/roadmap.service/userRoadmaps.service';
+interface User {
+    id: number;
+    email: string;
+    name: string,
+    createdAt: Date,
+    updatedAt: Date,
+}
 
 export const createRoadmap = async (req: Request, res: Response) => {
+    const user = req?.user as User;
+
     try {
-        const roadmap = await createRoadmapFunction(req.body.prompt);
-        res.status(201).json({
-            message: roadmap,
-        });
+        const response = await createRoadmapFunction(req.body?.prompt, user.id);
+        res.status(200).json(response);
     } catch (error) {
         console.error('Error creating roadmap:', error);
         res.status(500).json({
@@ -18,10 +25,12 @@ export const createRoadmap = async (req: Request, res: Response) => {
     }
 };
 
+
+
 export const getMyRoadmaps = async (req: Request, res: Response) => {
     try {
-
-        const roadmaps = await getUserRoadmaps(req.body.userId);
+        const user = req?.user as User;
+        const roadmaps = await getUserRoadmaps(user.id);
 
         res.status(200).json({
             message: 'Roadmap retrieved successfully',
@@ -35,9 +44,28 @@ export const getMyRoadmaps = async (req: Request, res: Response) => {
     }
 };
 
+export const getRoadmapById = async (req: Request, res: Response) => {
+    console.log('getRoadmapById:', req.params.id);
+
+    const roadmapId = Number(req.params.id);
+    try {
+        const roadmap = await getRoadmapByIdService(roadmapId);
+        res.status(200).json({
+            message: 'Roadmap retrieved successfully',
+            data: roadmap,
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: `Failed to get roadmap, ${error}`,
+            error: error, // Add the error message to the response
+        });
+    }
+};
+
 export const getRoadmapTitle = async (req: Request, res: Response) => {
     try {
-        const response = await getRoadmapTitleService(req.body.yourIntention, req.body.roadmapPrompt);
+        const user = req?.user as User;
+        const response = await getRoadmapTitleService(req.body.yourIntention, req.body.roadmapPrompt, user.id);
         res.status(200).json({
             message: response,
         });
@@ -51,7 +79,8 @@ export const getRoadmapTitle = async (req: Request, res: Response) => {
 
 export const getRoadmapOutline = async (req: Request, res: Response) => {
     try {
-        const response = await getResponse(req.body.roadmapPrompt);
+        const user = req?.user as User;
+        const response = await createRoadmapService(req.body?.prompt, user.id);
         res.status(200).json({
             message: response,
         });
