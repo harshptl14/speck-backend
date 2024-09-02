@@ -79,9 +79,9 @@ type RoadmapExistResponse = {
     id: number;
 } | {};
 
-export const availaleRoadmapInDB = async (userQuery: string): Promise<RoadmapExistResponse> => {
+export const availaleRoadmapInDB = async (userQuery: string, userId: number): Promise<RoadmapExistResponse> => {
     try {
-        const commaSeperatedUserRoadmaps = await userRoadmaps(1);
+        const commaSeperatedUserRoadmaps = await userRoadmaps(userId);
         const similarRoadmap = await similarTopics(userQuery, commaSeperatedUserRoadmaps);
 
         const existRoadmap: RoadmapExistResponse = JSON.parse(similarRoadmap);

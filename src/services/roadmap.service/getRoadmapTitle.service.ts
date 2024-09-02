@@ -3,7 +3,7 @@ import { availaleRoadmapInDB } from "./topicExist.service";
 import { groqModel } from "../../configs/longchain.config";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 
-export const getRoadmapTitleService = async (yourIntention: string, roadmapPrompt: string): Promise<string> => {
+export const getRoadmapTitleService = async (yourIntention: string, roadmapPrompt: string, userId: number): Promise<string> => {
     try {
 
         const getTitlePrompt = PromptTemplate.fromTemplate(`
@@ -21,7 +21,7 @@ Please provide only the 5 titles, numbered 1-5, without any additional explanati
 
         console.log(yourIntention, roadmapPrompt);
 
-        const isRoadmapAvailable = await availaleRoadmapInDB(roadmapPrompt);
+        const isRoadmapAvailable = await availaleRoadmapInDB(roadmapPrompt, userId);
 
         if (Object.keys(isRoadmapAvailable).length !== 0) {
             // User query is already available in the database

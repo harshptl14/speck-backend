@@ -4,6 +4,8 @@ export async function insertJsonToPrisma(jsonData: any, courseMetadata: any, use
     const prisma = new PrismaClient();
     console.log('Inserting data...', jsonData);
     console.log('type of data', typeof jsonData);
+    console.log('courseName', roadmapName);
+
     try {
         const roadmap = await prisma.$transaction(async (tx) => {
             const createdRoadmap = await tx.roadmap.create({
