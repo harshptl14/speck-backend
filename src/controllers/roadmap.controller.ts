@@ -3,6 +3,8 @@ import { createRoadmapService } from '../services/roadmap.service/roadmap.servic
 import { createRoadmapFunction } from '../services/roadmap.service/roadmapLongchain.service';
 import { getRoadmapTitleService } from '../services/roadmap.service/getRoadmapTitle.service';
 import { getRoadmapByIdService, getUserRoadmaps, getTopicByIdService } from '../services/roadmap.service/userRoadmaps.service';
+import { createRoadmapSchema, getRoadmapByIdSchema, getRoadmapTitleSchema, getRoadmapOutlineSchema } from '../models/roadmapSchemas';
+
 interface User {
     id: number;
     email: string;
@@ -14,8 +16,13 @@ interface User {
 export const createRoadmap = async (req: Request, res: Response) => {
     const user = req?.user as User;
 
+    const validationResult = createRoadmapSchema.safeParse(req.body);
+    if (!validationResult.success) {
+        return res.status(400).json({ errors: validationResult.error.errors });
+    }
+
     try {
-        const response = await createRoadmapFunction(req.body?.prompt, user.id);
+        const response = await createRoadmapFunction(req.body.prompt, user.id);
         res.status(200).json(response);
     } catch (error) {
         console.error('Error creating roadmap:', error);
@@ -24,8 +31,6 @@ export const createRoadmap = async (req: Request, res: Response) => {
         });
     }
 };
-
-
 
 export const getMyRoadmaps = async (req: Request, res: Response) => {
     try {
@@ -39,13 +44,16 @@ export const getMyRoadmaps = async (req: Request, res: Response) => {
     } catch (error) {
         res.status(500).json({
             message: `Failed to get roadmap, ${error}`,
-            error: error, // Add the error message to the response
+            error: error,
         });
     }
 };
 
 export const getRoadmapById = async (req: Request, res: Response) => {
-    console.log('getRoadmapById:', req.params.id);
+    const validationResult = getRoadmapByIdSchema.safeParse(req.params);
+    if (!validationResult.success) {
+        return res.status(400).json({ errors: validationResult.error.errors });
+    }
 
     const roadmapId = Number(req.params.id);
     try {
@@ -57,13 +65,16 @@ export const getRoadmapById = async (req: Request, res: Response) => {
     } catch (error) {
         res.status(500).json({
             message: `Failed to get roadmap, ${error}`,
-            error: error, // Add the error message to the response
+            error: error,
         });
     }
 };
 
 export const getTopicById = async (req: Request, res: Response) => {
-    console.log('getTopicById:', req.params.id);
+    const validationResult = getRoadmapByIdSchema.safeParse(req.params);
+    if (!validationResult.success) {
+        return res.status(400).json({ errors: validationResult.error.errors });
+    }
 
     const roadmapId = Number(req.params.id);
     try {
@@ -75,12 +86,17 @@ export const getTopicById = async (req: Request, res: Response) => {
     } catch (error) {
         res.status(500).json({
             message: `Failed to get topics, ${error}`,
-            error: error, // Add the error message to the response
+            error: error,
         });
     }
 };
 
 export const getRoadmapTitle = async (req: Request, res: Response) => {
+    const validationResult = getRoadmapTitleSchema.safeParse(req.body);
+    if (!validationResult.success) {
+        return res.status(400).json({ errors: validationResult.error.errors });
+    }
+
     try {
         const user = req?.user as User;
         const response = await getRoadmapTitleService(req.body.yourIntention, req.body.roadmapPrompt, user.id);
@@ -96,9 +112,14 @@ export const getRoadmapTitle = async (req: Request, res: Response) => {
 }
 
 export const getRoadmapOutline = async (req: Request, res: Response) => {
+    const validationResult = getRoadmapOutlineSchema.safeParse(req.body);
+    if (!validationResult.success) {
+        return res.status(400).json({ errors: validationResult.error.errors });
+    }
+
     try {
         const user = req?.user as User;
-        const response = await createRoadmapService(req.body?.prompt, user.id);
+        const response = await createRoadmapService(req.body.prompt, user.id);
         res.status(200).json({
             message: response,
         });
