@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { createRoadmapService } from '../services/roadmap.service/roadmap.service';
 import { createRoadmapFunction } from '../services/roadmap.service/roadmapLongchain.service';
 import { getRoadmapTitleService } from '../services/roadmap.service/getRoadmapTitle.service';
-import { getRoadmapByIdService, getUserRoadmaps } from '../services/roadmap.service/userRoadmaps.service';
+import { getRoadmapByIdService, getUserRoadmaps, getTopicByIdService } from '../services/roadmap.service/userRoadmaps.service';
 interface User {
     id: number;
     email: string;
@@ -57,6 +57,24 @@ export const getRoadmapById = async (req: Request, res: Response) => {
     } catch (error) {
         res.status(500).json({
             message: `Failed to get roadmap, ${error}`,
+            error: error, // Add the error message to the response
+        });
+    }
+};
+
+export const getTopicById = async (req: Request, res: Response) => {
+    console.log('getTopicById:', req.params.id);
+
+    const roadmapId = Number(req.params.id);
+    try {
+        const topics = await getTopicByIdService(roadmapId);
+        res.status(200).json({
+            message: 'Topic retrieved successfully',
+            data: topics,
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: `Failed to get topics, ${error}`,
             error: error, // Add the error message to the response
         });
     }

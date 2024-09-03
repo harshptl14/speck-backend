@@ -69,3 +69,26 @@ export const getRoadmapByIdService = async (roadmapId: number) => {
         throw error;
     }
 }
+
+export const getTopicByIdService = async (roadmapId: number) => {
+    try {
+        const prisma = new PrismaClient();
+
+        const topics = await prisma.topic.findMany({
+            where: {
+                roadmapId: roadmapId,
+            },
+            include: {
+                subtopics: true,
+            }
+        });
+
+
+        return {
+            topics
+        };
+    } catch (error) {
+        console.error('Error getting topics by id:', error);
+        throw error;
+    }
+}
