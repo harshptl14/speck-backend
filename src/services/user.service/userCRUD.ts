@@ -1,6 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../../../utils/client';
 
 // Function to get a user by email
 async function getUserByEmail(email: string) {

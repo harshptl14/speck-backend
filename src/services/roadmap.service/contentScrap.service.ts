@@ -3,7 +3,8 @@ require('dotenv').config();
 import { parseStringPromise } from "xml2js";
 import { groqModel } from "../../configs/longchain.config";
 import { PromptTemplate } from "@langchain/core/prompts";
-import { PrismaClient, Topic, Prisma, Subtopic } from "@prisma/client";
+import { Topic, Prisma, Subtopic } from "@prisma/client";
+import prisma from "../../../utils/client";
 import axios from 'axios';
 import { time } from "console";
 
@@ -184,7 +185,6 @@ export const populateFirstRoadmapTopic = async (roadmapID: number) => {
     // Fetch the roadmap from the DB
 
     console.log('Getting roadmap details and creating content for the first topic...');
-    const prisma = new PrismaClient();
     const roadmap = await prisma.roadmap.findUnique({
         where: {
             id: roadmapID
