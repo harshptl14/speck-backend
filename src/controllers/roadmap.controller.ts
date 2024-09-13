@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { createRoadmapService } from '../services/roadmap.service/roadmap.service';
 import { createRoadmapFunction } from '../services/roadmap.service/roadmapLongchain.service';
 import { getRoadmapTitleService } from '../services/roadmap.service/getRoadmapTitle.service';
-import { getRoadmapByIdService, getUserRoadmaps, getTopicByIdService } from '../services/roadmap.service/userRoadmaps.service';
+import { getRoadmapByIdService, getUserRoadmaps, getTopicsByIdService, getSubTopicByIdService } from '../services/roadmap.service/userRoadmaps.service';
 import { createRoadmapSchema, getRoadmapByIdSchema, getRoadmapTitleSchema, getRoadmapOutlineSchema } from '../models/roadmapSchemas';
 
 interface User {
@@ -70,7 +70,7 @@ export const getRoadmapById = async (req: Request, res: Response) => {
     }
 };
 
-export const getTopicById = async (req: Request, res: Response) => {
+export const getTopicsById = async (req: Request, res: Response) => {
     const validationResult = getRoadmapByIdSchema.safeParse(req.params);
     if (!validationResult.success) {
         return res.status(400).json({ errors: validationResult.error.errors });
@@ -78,7 +78,28 @@ export const getTopicById = async (req: Request, res: Response) => {
 
     const roadmapId = Number(req.params.id);
     try {
-        const topics = await getTopicByIdService(roadmapId);
+        const topics = await getTopicsByIdService(roadmapId);
+        res.status(200).json({
+            message: 'Topic retrieved successfully',
+            data: topics,
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: `Failed to get topics, ${error}`,
+            error: error,
+        });
+    }
+};
+
+export const getSubTopicById = async (req: Request, res: Response) => {
+    const validationResult = getRoadmapByIdSchema.safeParse(req.params);
+    if (!validationResult.success) {
+        return res.status(400).json({ errors: validationResult.error.errors });
+    }
+
+    const roadmapId = Number(req.params.id);
+    try {
+        const topics = await getSubTopicByIdService(roadmapId);
         res.status(200).json({
             message: 'Topic retrieved successfully',
             data: topics,

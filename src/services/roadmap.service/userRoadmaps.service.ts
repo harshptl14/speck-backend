@@ -1,10 +1,9 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "../../../utils/client";
 
 export const getUserRoadmaps = async (userId: number) => {
     console.log('userId: in userRoadmaps services:', userId);
 
     try {
-        const prisma = new PrismaClient();
         const roadmaps = await prisma.roadmap.findMany({
             where: {
                 userId: userId,
@@ -19,7 +18,6 @@ export const getUserRoadmaps = async (userId: number) => {
 
 export const getRoadmapByIdService = async (roadmapId: number) => {
     try {
-        const prisma = new PrismaClient();
         const roadmap = await prisma.roadmap.findUnique({
             where: {
                 id: roadmapId,
@@ -62,6 +60,7 @@ export const getRoadmapByIdService = async (roadmapId: number) => {
             topicCount,
             subtopicCount,
             approximateTime,
+            initialSubtopic: topics[0]?.subtopics[0]?.id,
         };
 
     } catch (error) {
@@ -70,25 +69,104 @@ export const getRoadmapByIdService = async (roadmapId: number) => {
     }
 }
 
-export const getTopicByIdService = async (roadmapId: number) => {
+export const getTopicsByIdService = async (roadmapId: number) => {
     try {
-        const prisma = new PrismaClient();
+
+        const roadmap = await prisma.roadmap.findUnique({
+            where: {
+                id: roadmapId,
+            },
+            select: {
+                name: true,
+            }
+        });
 
         const topics = await prisma.topic.findMany({
             where: {
                 roadmapId: roadmapId,
             },
-            include: {
-                subtopics: true,
+            select: {
+                name: true,
+                id: true,
+                subtopics: {
+                    select: {
+                        name: true,
+                        id: true,
+                    }
+                }
             }
         });
 
-
         return {
-            topics
+            topics,
+            roadmap
         };
     } catch (error) {
         console.error('Error getting topics by id:', error);
+        throw error;
+    }
+}
+
+export const getSubTopicByIdService = async (subtopicId: number) => {
+    try {
+        const subtopic = await prisma.subtopic.findUnique({
+            where: {
+                id: subtopicId,
+            },
+            include: {
+                textContents: {
+                    select: {
+                        content: true,
+                        id: true,
+                    }
+                },
+            },
+        });
+
+        const normalVideoContents = await prisma.videoContent.findMany({
+            where: {
+                subtopicId: subtopicId,
+                videoType: 'VIDEO',
+            },
+            select: {
+                id: true,
+                link: true,
+                name: true,
+                duration: true,
+                thumbnail: true,
+                videoType: true,
+            }
+        });
+
+        const shortsVideoContents = await prisma.videoContent.findMany({
+            where: {
+                subtopicId: subtopicId,
+                videoType: 'SHORTS',
+            },
+            select: {
+                id: true,
+                link: true,
+                name: true,
+                duration: true,
+                thumbnail: true,
+                videoType: true,
+            }
+        });
+
+        const fianlObj = {
+            subtopic,
+            normalVideoContents,
+            shortsVideoContents,
+        };
+
+
+        return {
+            subtopic,
+            normalVideoContents,
+            shortsVideoContents,
+        };
+    } catch (error) {
+        console.error('Error getting subtopic by id:', error);
         throw error;
     }
 }
