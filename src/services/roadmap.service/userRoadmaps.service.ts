@@ -135,6 +135,7 @@ export const getSubTopicByIdService = async (subtopicId: number) => {
                 duration: true,
                 thumbnail: true,
                 videoType: true,
+                transcript: true,
             }
         });
 
