@@ -2,8 +2,8 @@ import { Request, Response } from 'express';
 import { createRoadmapService } from '../services/roadmap.service/roadmap.service';
 import { createRoadmapFunction } from '../services/roadmap.service/roadmapLongchain.service';
 import { getRoadmapTitleService } from '../services/roadmap.service/getRoadmapTitle.service';
-import { getRoadmapByIdService, getUserRoadmaps, getTopicsByIdService, getSubTopicByIdService } from '../services/roadmap.service/userRoadmaps.service';
-import { createRoadmapSchema, getRoadmapByIdSchema, getRoadmapTitleSchema, getRoadmapOutlineSchema } from '../models/roadmapSchemas';
+import { getRoadmapByIdService, getUserRoadmaps, getTopicsByIdService, getSubTopicByIdService, getRoadmapsInfoByUserIdService } from '../services/roadmap.service/userRoadmaps.service';
+import { createRoadmapSchema, getRoadmapByIdSchema, getRoadmapTitleSchema, getRoadmapOutlineSchema, getRoadmapsInfoByUserIdSchema } from '../models/roadmapSchemas';
 
 interface User {
     id: number;
@@ -151,3 +151,25 @@ export const getRoadmapOutline = async (req: Request, res: Response) => {
         });
     }
 }
+
+
+export const getRoadmapsInfoByUserId = async (req: Request, res: Response) => {
+    const validationResult = getRoadmapsInfoByUserIdSchema.safeParse(req.params);
+    if (!validationResult.success) {
+        return res.status(400).json({ errors: validationResult.error.errors });
+    }
+
+    const userId = Number(req.params.id);
+    try {
+        const roadmapsInfo = await getRoadmapsInfoByUserIdService(userId);
+        res.status(200).json({
+            message: 'Roadmaps info retrieved successfully',
+            data: roadmapsInfo,
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: `Failed to get Roadmaps info, ${error}`,
+            error: error,
+        });
+    }
+};

@@ -16,3 +16,7 @@ export const getRoadmapTitleSchema = z.object({
 export const getRoadmapOutlineSchema = z.object({
     prompt: z.string().min(1, "Prompt is required"),
 });
+
+export const getRoadmapsInfoByUserIdSchema = z.object({
+    id: z.string().regex(/^\d+$/, "ID must be a number"),
+});
