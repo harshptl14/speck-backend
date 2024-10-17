@@ -1,4 +1,4 @@
-import prisma from '../../../utils/client';
+import { prisma } from '../../../utils/client';
 
 export async function insertJsonToPrisma(jsonData: any, courseMetadata: any, userId: number, roadmapName: string): Promise<number> {
     console.log('Inserting data...', jsonData);

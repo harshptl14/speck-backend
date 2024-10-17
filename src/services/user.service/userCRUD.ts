@@ -1,4 +1,4 @@
-import prisma from '../../../utils/client';
+import { prisma } from '../../../utils/client';
 
 // Function to get a user by email
 async function getUserByEmail(email: string) {

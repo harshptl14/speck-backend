@@ -1,4 +1,4 @@
-import prisma from "../../../utils/client";
+import {prisma} from "../../../utils/client";
 
 export const getUserRoadmaps = async (userId: number) => {
     console.log('userId: in userRoadmaps services:', userId);
@@ -171,3 +171,7 @@ export const getSubTopicByIdService = async (subtopicId: number) => {
         throw error;
     }
 }
+
+// export const createSubtopicContentService = async (subtopicId: number) => {
+    
+// }
