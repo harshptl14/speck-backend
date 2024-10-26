@@ -138,7 +138,7 @@ model Progress {
   createdAt  DateTime       @default(now())
   updatedAt  DateTime       @updatedAt
 
-  @@unique([userId, roadmapId, topicId, subtopicId])
+  @@unique([userId, roadmapId, topicId, subtopicId]) // Subtopic-level progress
 }
 
 model Favorite {

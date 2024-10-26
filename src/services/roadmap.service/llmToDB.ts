@@ -1,4 +1,4 @@
-import prisma from '../../../utils/client';
+import { prisma } from '../../../utils/client';
 
 export async function insertJsonToPrisma(jsonData: any, courseMetadata: any, userId: number, roadmapName: string): Promise<number> {
     console.log('Inserting data...', jsonData);
@@ -26,21 +26,58 @@ export async function insertJsonToPrisma(jsonData: any, courseMetadata: any, use
                     },
                 });
 
-                const subtopicPromises = topic.subtopics.map((subtopic: any) =>
-                    tx.subtopic.create({
+                const subtopicPromises = topic.subtopics.map(async (subtopic: any) => {
+                    const createdSubtopic = await tx.subtopic.create({
                         data: {
                             name: subtopic.name,
                             description: subtopic.description,
                             order: subtopic.order,
                             topicId: createdTopic.id,
                         },
-                    })
-                );
+                    });
+
+                    // Add default progress for the subtopic
+                    await tx.progress.create({
+                        data: {
+                            userId: userId,
+                            roadmapId: createdRoadmap.id,
+                            topicId: createdTopic.id,
+                            subtopicId: createdSubtopic.id,
+                            status: 'NOT_STARTED',
+                        },
+                    });
+
+                    return createdSubtopic;
+                });
 
                 await Promise.all(subtopicPromises);
+
+                // Add default progress for the topic
+                await tx.progress.create({
+                    data: {
+                        userId: userId,
+                        roadmapId: createdRoadmap.id,
+                        topicId: createdTopic.id,
+                        subtopicId: 0,
+                        status: 'NOT_STARTED',
+                    },
+                });
+
+                return createdTopic;
             });
 
             await Promise.all(topicPromises);
+
+            // Add default progress for the roadmap
+            await tx.progress.create({
+                data: {
+                    userId: userId,
+                    roadmapId: createdRoadmap.id,
+                    topicId: 0,
+                    subtopicId: 0,
+                    status: 'NOT_STARTED',
+                },
+            });
 
             return createdRoadmap;
         });

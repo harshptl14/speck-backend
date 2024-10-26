@@ -11,7 +11,7 @@
 
 import { groqModel } from "../../configs/longchain.config";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
-import prisma from "../../../utils/client";
+import { prisma } from "../../../utils/client";
 
 const similarTopics = async (userQuery: string, commaSeperatedUserRoadmaps: string | null): Promise<string> => {
     const SYSTEM_PROMPT = `You are a expert in finding similar things. Given the user query, and the roadmaps that are already present in the database, you need to tell me whether that query/roadmap is already in the dabase or not. I will provide you with the roadmap name and the id of the roadmap. If you find the similar roadmap based on the user query which is already present in the string that I will give you, you need to return JSON object with the roadmap name and the id of the roadmap. If you don't find the roadmap, you need to return an empty JSON object. Please frovide the JSON object only NO Other thing. HERE IS THE STRING: {commaSeperatedUserRoadmaps}, if {commaSeperatedUserRoadmaps}`;
