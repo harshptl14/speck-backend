@@ -196,11 +196,11 @@ export const getRoadmapOutline = async (req: Request, res: Response) => {
 
 export const getRoadmapsInfoByUserId = async (req: Request, res: Response) => {
     const validationResult = getRoadmapsInfoByUserIdSchema.safeParse(req.params);
-  
+
     if (!validationResult.success) {
         return res.status(400).json({ errors: validationResult.error.errors });
     }
-      const userId = Number(req.params.id);
+    const userId = Number(req.params.id);
     try {
         const roadmapsInfo = await getRoadmapsInfoByUserIdService(userId);
         res.status(200).json({
@@ -223,6 +223,12 @@ export const updateSubtopicCompletion = async (req: Request, res: Response) => {
     const { topicId, subtopicId, newStatus, roadmapId } = req.body;
     try {
         const user = req?.user as User;
+        const topics = await getSubTopicByIdService(subtopicId);
+        if (topics.subtopic?.textContents.length === 0) {
+            return res.status(422).json({
+                message: 'Can\'t update, you haven\'t generated the content yet'
+            });
+        }
         const response = await updateSubtopicCompletionService(roadmapId, topicId, subtopicId, newStatus, user.id);
         res.status(200).json({
             message: 'Subtopic completion status updated successfully',
