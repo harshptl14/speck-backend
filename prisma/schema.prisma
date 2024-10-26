@@ -12,9 +12,10 @@ model User {
   email     String     @unique
   name      String
   roadmaps  Roadmap[]  @relation("UserRoadmaps")
+  Progress  Progress[]
+  favorites Favorite[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
-  Progress  Progress[]
 
   @@index([email])
 }
@@ -28,6 +29,7 @@ model Roadmap {
   user        User       @relation("UserRoadmaps", fields: [userId], references: [id], onDelete: Cascade)
   topics      Topic[]
   progress    Progress[] @relation("RoadmapProgress")
+  favorites   Favorite[]
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
@@ -136,7 +138,18 @@ model Progress {
   createdAt  DateTime       @default(now())
   updatedAt  DateTime       @updatedAt
 
-  @@unique([userId, roadmapId, topicId, subtopicId])
+  @@unique([userId, roadmapId, topicId, subtopicId]) // Subtopic-level progress
+}
+
+model Favorite {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  roadmapId Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roadmap   Roadmap  @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, roadmapId])
 }
 
 enum ContentType {

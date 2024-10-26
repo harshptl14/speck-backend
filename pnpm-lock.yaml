@@ -10,22 +10,28 @@ importers:
     dependencies:
       '@langchain/core':
         specifier: ^0.2.15
-        version: 0.2.15(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1))(openai@4.52.4)
+        version: 0.2.15(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1))(openai@4.52.4)
       '@langchain/groq':
         specifier: ^0.0.13
         version: 0.0.13(langchain@0.2.11)(openai@4.52.4)
       '@langchain/openai':
         specifier: ^0.2.2
-        version: 0.2.2(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1))
+        version: 0.2.2(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1))
       '@prisma/client':
         specifier: ^5.16.2
         version: 5.16.2(prisma@5.16.2)
+      '@types/cheerio':
+        specifier: ^0.22.35
+        version: 0.22.35
       '@types/express-session':
         specifier: ^1.18.0
         version: 1.18.0
       axios:
         specifier: ^1.7.2
         version: 1.7.2
+      cheerio:
+        specifier: ^1.0.0
+        version: 1.0.0
       cors:
         specifier: ^2.8.5
         version: 2.8.5
@@ -44,12 +50,15 @@ importers:
       helmet:
         specifier: ^7.1.0
         version: 7.1.0
+      ioredis:
+        specifier: ^5.4.1
+        version: 5.4.1
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
       langchain:
         specifier: ^0.2.11
-        version: 0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1)
+        version: 0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1)
       morgan:
         specifier: ^1.10.0
         version: 1.10.0
@@ -68,6 +77,9 @@ importers:
       prisma:
         specifier: ^5.16.2
         version: 5.16.2
+      redis:
+        specifier: ^4.7.0
+        version: 4.7.0
       xml2js:
         specifier: ^0.6.2
         version: 0.6.2
@@ -350,6 +362,9 @@ packages:
     resolution: {integrity: sha512-93zYdMES/c1D69yZiKDBj0V24vqNzB/koF26KPaagAfd3P/4gUlh3Dys5ogAK+Exi9QyzlD8x/08Zt7wIKcDcA==}
     deprecated: Use @eslint/object-schema instead
 
+  '@ioredis/commands@1.2.0':
+    resolution: {integrity: sha512-Sx1pU8EM64o2BrqNpEO1CNLtKQwyhuXuqyfH7oGKCk+1a33d2r5saW8zNwm3j6BTExtjrv2BxTgzzkMwts6vGg==}
+
   '@istanbuljs/load-nyc-config@1.1.0':
     resolution: {integrity: sha512-VjeHSlIzpv/NyD3N0YuHfXOPDIixcA1q2ZV98wsMqcYlPmv2n3Yb2lYP9XMElnaFVXg5A7YLTeLu6V84uQDjmQ==}
     engines: {node: '>=8'}
@@ -505,6 +520,35 @@ packages:
   '@prisma/get-platform@5.16.2':
     resolution: {integrity: sha512-cXiHPgNLNyj22vLouPVNegklpRL/iX2jxTeap5GRO3DmCoVyIHmJAV1CgUMUJhHlcol9yYy7EHvsnXTDJ/PKEA==}
 
+  '@redis/bloom@1.2.0':
+    resolution: {integrity: sha512-HG2DFjYKbpNmVXsa0keLHp/3leGJz1mjh09f2RLGGLQZzSHpkmZWuwJbAvo3QcRY8p80m5+ZdXZdYOSBLlp7Cg==}
+    peerDependencies:
+      '@redis/client': ^1.0.0
+
+  '@redis/client@1.6.0':
+    resolution: {integrity: sha512-aR0uffYI700OEEH4gYnitAnv3vzVGXCFvYfdpu/CJKvk4pHfLPEy/JSZyrpQ+15WhXe1yJRXLtfQ84s4mEXnPg==}
+    engines: {node: '>=14'}
+
+  '@redis/graph@1.1.1':
+    resolution: {integrity: sha512-FEMTcTHZozZciLRl6GiiIB4zGm5z5F3F6a6FZCyrfxdKOhFlGkiAqlexWMBzCi4DcRoyiOsuLfW+cjlGWyExOw==}
+    peerDependencies:
+      '@redis/client': ^1.0.0
+
+  '@redis/json@1.0.7':
+    resolution: {integrity: sha512-6UyXfjVaTBTJtKNG4/9Z8PSpKE6XgSyEb8iwaqDcy+uKrd/DGYHTWkUdnQDyzm727V7p21WUMhsqz5oy65kPcQ==}
+    peerDependencies:
+      '@redis/client': ^1.0.0
+
+  '@redis/search@1.2.0':
+    resolution: {integrity: sha512-tYoDBbtqOVigEDMAcTGsRlMycIIjwMCgD8eR2t0NANeQmgK/lvxNAvYyb6bZDD4frHRhIHkJu2TBRvB0ERkOmw==}
+    peerDependencies:
+      '@redis/client': ^1.0.0
+
+  '@redis/time-series@1.1.0':
+    resolution: {integrity: sha512-c1Q99M5ljsIuc4YdaCwfUEXsofakb9c8+Zse2qxTadu8TalLXuAESzLvFAvNVbkmSlvlzIQOLpBCmWI9wTOt+g==}
+    peerDependencies:
+      '@redis/client': ^1.0.0
+
   '@sinclair/typebox@0.27.8':
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
 
@@ -540,6 +584,9 @@ packages:
 
   '@types/body-parser@1.19.5':
     resolution: {integrity: sha512-fB3Zu92ucau0iQ0JMCFQE7b/dv8Ot07NI3KaZIkIUNXq82k4eBAqUaneXfleGY9JWskeS9y+u0nXMyspcuQrCg==}
+
+  '@types/cheerio@0.22.35':
+    resolution: {integrity: sha512-yD57BchKRvTV+JD53UZ6PD8KWY5g5rvvMLRnZR3EQBCZXiDT/HR+pKpMzFGlWNhFrXlo7VPZXtKvIEwZkAWOIA==}
 
   '@types/connect@3.4.38':
     resolution: {integrity: sha512-K6uROf1LD88uDQqJCktA4yzL1YYAK6NgfsI0v/mTgyPKWsX1CnJ0XPSDhViejru1GcRkLWb8RlzFYJRqGUbaug==}
@@ -869,6 +916,9 @@ packages:
     resolution: {integrity: sha512-ml9pReCu3M61kGlqoTm2umSXTlRTuGTx0bfYj+uIUKKYycG5NtSbeetV3faSU6R7ajOPw0g/J1PvK4qNy7s5bA==}
     engines: {node: '>= 0.8', npm: 1.2.8000 || >= 1.4.16}
 
+  boolbase@1.0.0:
+    resolution: {integrity: sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==}
+
   brace-expansion@1.1.11:
     resolution: {integrity: sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==}
 
@@ -935,6 +985,13 @@ packages:
   charenc@0.0.2:
     resolution: {integrity: sha512-yrLQ/yVUFXkzg7EDQsPieE/53+0RlaWTs+wBrvW36cyilJ2SaDWfl4Yj7MtLTXleV9uEKefbAGUPv2/iWSooRA==}
 
+  cheerio-select@2.1.0:
+    resolution: {integrity: sha512-9v9kG0LvzrlcungtnJtpGNxY+fzECQKhK4EGJX2vByejiMX84MFNQw4UxPJl3bFbTMw+Dfs37XaIkCwTZfLh4g==}
+
+  cheerio@1.0.0:
+    resolution: {integrity: sha512-quS9HgjQpdaXOvsZz82Oz7uxtXiy6UIsIQcpBj7HRw2M63Skasm9qlDocAM7jNuaxdhpPU7c4kJN+gA5MCu4ww==}
+    engines: {node: '>=18.17'}
+
   chokidar@3.6.0:
     resolution: {integrity: sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw==}
     engines: {node: '>= 8.10.0'}
@@ -949,6 +1006,10 @@ packages:
   cliui@8.0.1:
     resolution: {integrity: sha512-BSeNnyus75C4//NQ9gQt1/csTXyo/8Sb+afLAkzAptFuMsod9HFokGNudZpi/oQV73hnVK+sR+5PVRMd+Dr7YQ==}
     engines: {node: '>=12'}
+
+  cluster-key-slot@1.1.2:
+    resolution: {integrity: sha512-RMr0FhtfXemyinomL4hrWcYJxmX6deFdCxpJzhDttxgO1+bcCnkk+9drydLVDmAMG7NE6aN/fl4F7ucU/90gAA==}
+    engines: {node: '>=0.10.0'}
 
   co@4.6.0:
     resolution: {integrity: sha512-QVb0dM5HvG+uaxitm8wONl7jltx8dqhfU33DcqtOZcLSVIKSDDLDi7+0LbAKiyI8hD9u42m2YxXSkMGWThaecQ==}
@@ -1030,6 +1091,13 @@ packages:
   crypt@0.0.2:
     resolution: {integrity: sha512-mCxBlsHFYh9C+HVpiEacem8FEBnMXgU9gy4zmNC+SXAZNB/1idgp/aulFJ4FgCi7GPEVbfyng092GqL2k2rmow==}
 
+  css-select@5.1.0:
+    resolution: {integrity: sha512-nwoRF1rvRRnnCqqY7updORDsuqKzqYJ28+oSMaJMMgOauh3fvwHqMS7EZpIPqK8GL+g9mKxF1vP/ZjSeNjEVHg==}
+
+  css-what@6.1.0:
+    resolution: {integrity: sha512-HTUrgRJ7r4dsZKU6GjmpfRK1O76h97Z8MfS1G0FozR+oF2kG6Vfe8JE6zwrkbxigziPHinCJ+gCPjA9EaBDtRw==}
+    engines: {node: '>= 6'}
+
   data-view-buffer@1.0.1:
     resolution: {integrity: sha512-0lht7OugA5x3iJLOWFhWK/5ehONdprk0ISXqVFn/NFrDu+cuc8iADFrGQz5BnRK7LLU3JmkbXSxaqX+/mXYtUA==}
     engines: {node: '>= 0.4'}
@@ -1098,6 +1166,10 @@ packages:
     resolution: {integrity: sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==}
     engines: {node: '>=0.4.0'}
 
+  denque@2.1.0:
+    resolution: {integrity: sha512-HVQE3AAb/pxF8fQAoiqpvg9i3evqug3hoiwakOyZAwJm+6vZehbkYXZ0l4JxS+I3QxM97v5aaRNhj8v5oBhekw==}
+    engines: {node: '>=0.10'}
+
   depd@2.0.0:
     resolution: {integrity: sha512-g7nH6P6dyDioJogAAGprGpCtVImJhpPk/roCzdb3fIh61/s/nPsfR6onyMwkCAR/OlC3yBC0lESvUoQEAssIrw==}
     engines: {node: '>= 0.8'}
@@ -1136,6 +1208,19 @@ packages:
     resolution: {integrity: sha512-yS+Q5i3hBf7GBkd4KG8a7eBNNWNGLTaEwwYWUijIYM7zrlYDM0BFXHjjPWlWZ1Rg7UaddZeIDmi9jF3HmqiQ2w==}
     engines: {node: '>=6.0.0'}
 
+  dom-serializer@2.0.0:
+    resolution: {integrity: sha512-wIkAryiqt/nV5EQKqQpo3SToSOV9J0DnbJqwK7Wv/Trc92zIAYZ4FlMu+JPFW1DfGFt81ZTCGgDEabffXeLyJg==}
+
+  domelementtype@2.3.0:
+    resolution: {integrity: sha512-OLETBj6w0OsagBwdXnPdN0cnMfF9opN69co+7ZrbfPGrdpPVNBUj02spi6B1N7wChLQiPn4CSH/zJvXw56gmHw==}
+
+  domhandler@5.0.3:
+    resolution: {integrity: sha512-cgwlv/1iFQiFnU96XXgROh8xTeetsnJiDsTc7TYCLFd9+/WNkIqPTxiM/8pSd8VIrhXGTf1Ny1q1hquVqDJB5w==}
+    engines: {node: '>= 4'}
+
+  domutils@3.1.0:
+    resolution: {integrity: sha512-H78uMmQtI2AhgDJjWeQmHwJJ2bLPD3GMmO7Zja/ZZh84wkm+4ut+IUnUdRa8uCGX88DiVx1j6FRe1XfxEgjEZA==}
+
   dotenv@16.4.5:
     resolution: {integrity: sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==}
     engines: {node: '>=12'}
@@ -1160,9 +1245,16 @@ packages:
     resolution: {integrity: sha512-TPJXq8JqFaVYm2CWmPvnP2Iyo4ZSM7/QKcSmuMLDObfpH5fi7RUGmd/rTDf+rut/saiDiQEeVTNgAmJEdAOx0w==}
     engines: {node: '>= 0.8'}
 
+  encoding-sniffer@0.2.0:
+    resolution: {integrity: sha512-ju7Wq1kg04I3HtiYIOrUrdfdDvkyO9s5XM8QAj/bN61Yo/Vb4vgJxy5vi4Yxk01gWHbrofpPtpxM8bKger9jhg==}
+
   enhanced-resolve@5.17.0:
     resolution: {integrity: sha512-dwDPwZL0dmye8Txp2gzFmA6sxALaSvdRDjPH0viLcKrtlOL3tw62nWWweVD1SdILDTJrbrL6tdWVN58Wo6U3eA==}
     engines: {node: '>=10.13.0'}
+
+  entities@4.5.0:
+    resolution: {integrity: sha512-V0hjH4dGPh9Ao5p0MoRY6BVqtwCjhz6vI5LT8AJ55H+4g9/4vbHx1I54fS0XuclLhDHArPQCiMjDxjaL8fPxhw==}
+    engines: {node: '>=0.12'}
 
   error-ex@1.3.2:
     resolution: {integrity: sha512-7dFHNmqeFSEt2ZBsCriorKnn3Z2pj+fd9kmI6QoWw4//DL+icEBfc0U7qJCisqrTsKTjw4fNFy2pW9OqStD84g==}
@@ -1438,6 +1530,10 @@ packages:
   functions-have-names@1.2.3:
     resolution: {integrity: sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==}
 
+  generic-pool@3.9.0:
+    resolution: {integrity: sha512-hymDOu5B53XvN4QT9dBmZxPX4CWhBPPLguTZ9MMFeFa/Kg0xWVfylOVNlJji/E7yTZWFd/q9GO5TxDLq156D7g==}
+    engines: {node: '>= 4'}
+
   gensync@1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
     engines: {node: '>=6.9.0'}
@@ -1549,6 +1645,9 @@ packages:
   html-escaper@2.0.2:
     resolution: {integrity: sha512-H2iMtd0I4Mt5eYiapRdIDjp+XzelXQ0tFE4JS7YFwFevXXMmOp9myNrUvCg0D6ws8iqkRPBfKHgbwig1SmlLfg==}
 
+  htmlparser2@9.1.0:
+    resolution: {integrity: sha512-5zfg6mHUoaer/97TxnGpxmbR7zJtPwIYFMZ/H5ucTlPZhKvtum05yiPK3Mgai3a0DyVxv7qYqoweaEd2nrYQzQ==}
+
   http-errors@2.0.0:
     resolution: {integrity: sha512-FtwrG/euBzaEjYeRqOgly7G0qviiXoJWnvEH2Z1plBdXgbyjv34pHTSb9zoeHMyDy33+DWy5Wt9Wo+TURtOYSQ==}
     engines: {node: '>= 0.8'}
@@ -1562,6 +1661,10 @@ packages:
 
   iconv-lite@0.4.24:
     resolution: {integrity: sha512-v3MXnZAcvnywkTUEZomIActle7RXXeedOR31wwl7VlyoXO4Qi9arvSenNQWne1TcRwhCL1HwLI21bEqdpj8/rA==}
+    engines: {node: '>=0.10.0'}
+
+  iconv-lite@0.6.3:
+    resolution: {integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==}
     engines: {node: '>=0.10.0'}
 
   ignore-by-default@1.0.1:
@@ -1594,6 +1697,10 @@ packages:
   internal-slot@1.0.7:
     resolution: {integrity: sha512-NGnrKwXzSms2qUUih/ILZ5JBqNTSa1+ZmP6flaIp6KmSElgE9qdndzS3cqjrDovwFdmwsGsLdeFgB6suw+1e9g==}
     engines: {node: '>= 0.4'}
+
+  ioredis@5.4.1:
+    resolution: {integrity: sha512-2YZsvl7jopIa1gaePkeMtd9rAcSjOOjPtpcLlOeusyO+XH2SK5ZcT+UCrElPP+WVIInh2TzeI4XW9ENaSLVVHA==}
+    engines: {node: '>=12.22.0'}
 
   ipaddr.js@1.9.1:
     resolution: {integrity: sha512-0KI/607xoxSToH7GjN1FfSbLoU0+btTicjsQSWQlh/hZykN8KpmMf7uYwPW3R+akZ6R/w18ZlXSHBYXiYUPO3g==}
@@ -2140,8 +2247,14 @@ packages:
     resolution: {integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==}
     engines: {node: '>=10'}
 
+  lodash.defaults@4.2.0:
+    resolution: {integrity: sha512-qjxPLHd3r5DnsdGacqOMU6pb/avJzdh9tFX2ymgoZE27BmjXrNy/y4LoaiTeAb+O3gL8AfpJGtqfX/ae2leYYQ==}
+
   lodash.includes@4.3.0:
     resolution: {integrity: sha512-W3Bx6mdkRTGtlJISOvVD/lbqjTlPPUDTMnlXZFnVwi9NKJ6tiAk6LVdlhZMm17VZisqhKcgzpO5Wz91PCt5b0w==}
+
+  lodash.isarguments@3.1.0:
+    resolution: {integrity: sha512-chi4NHZlZqZD18a0imDHnZPrDeBbTtVN7GXMwuGdRH9qotxAjYs3aVLKc7zNOG9eddR5Ksd8rvFEBc9SsggPpg==}
 
   lodash.isboolean@3.0.3:
     resolution: {integrity: sha512-Bz5mupy2SVbPHURB98VAcw+aHh4vRV5IPNhILUCsOzRmsTmSQ17jIuqopAentWoehktxGd9e/hbIXq980/1QJg==}
@@ -2308,6 +2421,9 @@ packages:
     resolution: {integrity: sha512-S48WzZW777zhNIrn7gxOlISNAqi9ZC/uQFnRdbeIHhZhCA6UqpkOT8T1G7BvfdgP4Er8gF4sUbaS0i7QvIfCWw==}
     engines: {node: '>=8'}
 
+  nth-check@2.1.1:
+    resolution: {integrity: sha512-lqjrjmaOoAnWfMmBPL+XNnynZh2+swxiX3WUE0s4yEHI6m+AwrK2UZOimIRl3X/4QctVqS8AiZjFqyOGrMXb/w==}
+
   num-sort@2.1.0:
     resolution: {integrity: sha512-1MQz1Ed8z2yckoBeSfkQHHO9K1yDRxxtotKSJ9yvcTUUxSvfvzEq5GwBrjjHEpMlq/k5gvXdmJ1SbYxWtpNoVg==}
     engines: {node: '>=8'}
@@ -2420,6 +2536,15 @@ packages:
   parse-json@5.2.0:
     resolution: {integrity: sha512-ayCKvm/phCGxOkYRSCM82iDwct8/EonSEgCSxWxD7ve6jHggsFl4fZVQBPRNgQoKiuV/odhFrGzQXZwbifC8Rg==}
     engines: {node: '>=8'}
+
+  parse5-htmlparser2-tree-adapter@7.1.0:
+    resolution: {integrity: sha512-ruw5xyKs6lrpo9x9rCZqZZnIUntICjQAd0Wsmp396Ul9lN/h+ifgVV1x1gZHi8euej6wTfpqX8j+BFQxF0NS/g==}
+
+  parse5-parser-stream@7.1.2:
+    resolution: {integrity: sha512-JyeQc9iwFLn5TbvvqACIF/VXG6abODeB3Fwmv/TGdLk2LfbWkaySGY72at4+Ty7EkPZj854u4CrICqNk2qIbow==}
+
+  parse5@7.2.0:
+    resolution: {integrity: sha512-ZkDsAOcxsUMZ4Lz5fVciOehNcJ+Gb8gTzcA4yl3wnc273BAybYWrQ+Ks/OjCjSEpjvQkDSeZbybK9qj2VHHdGA==}
 
   parseurl@1.3.3:
     resolution: {integrity: sha512-CiyeOxFT/JZyN5m0z9PfXw4SCBJ6Sygz1Dpl0wqjlhDEGGBP1GnsUVEL0p63hoG1fcj3fHynXi9NYO4nWOL+qQ==}
@@ -2551,6 +2676,17 @@ packages:
   readdirp@3.6.0:
     resolution: {integrity: sha512-hOS089on8RduqdbhvQ5Z37A0ESjsqz6qnRcffsMU3495FuTdqSm+7bhJ29JvIOsBDEEnan5DPu9t3To9VRlMzA==}
     engines: {node: '>=8.10.0'}
+
+  redis-errors@1.2.0:
+    resolution: {integrity: sha512-1qny3OExCf0UvUV/5wpYKf2YwPcOqXzkwKKSmKHiE6ZMQs5heeE/c8eXK+PNllPvmjgAbfnsbpkGZWy8cBpn9w==}
+    engines: {node: '>=4'}
+
+  redis-parser@3.0.0:
+    resolution: {integrity: sha512-DJnGAeenTdpMEH6uAJRK/uiyEIH9WVsUmoLwzudwGJUwZPp80PDBWPHXSAGNPwNvIXAbe7MSUB1zQFugFml66A==}
+    engines: {node: '>=4'}
+
+  redis@4.7.0:
+    resolution: {integrity: sha512-zvmkHEAdGMn+hMRXuMBtu4Vo5P6rHQjLoHftu+lBqq8ZTA3RCVC/WzD790bkKKiNFp7d5/9PcSD19fJyyRvOdQ==}
 
   regexp.prototype.flags@1.5.2:
     resolution: {integrity: sha512-NcDiDkTLuPR+++OCKB0nWafEmhg/Da8aUPLPMQbK+bxKKCm1/S5he+AqYa4PlMCVBalb4/yxIRub6qkEx5yJbw==}
@@ -2686,6 +2822,9 @@ packages:
   stack-utils@2.0.6:
     resolution: {integrity: sha512-XlkWvfIm6RmsWtNJx+uqtKLS8eqFbxUg0ZzLXqY0caEy9l7hruX8IpiDnjsLavoBgqCCR71TqWO8MaXYheJ3RQ==}
     engines: {node: '>=10'}
+
+  standard-as-callback@2.1.0:
+    resolution: {integrity: sha512-qoRRSyROncaz1z0mvYqIE4lCd9p2R90i6GxW3uZv5ucSu8tU7B5HXUP1gG8pVZsYNVaXjk8ClXHPttLyxAL48A==}
 
   statuses@2.0.1:
     resolution: {integrity: sha512-RwNA9Z/7PrK06rYLIzFMlaF+l73iwpzsqRIFgbMLbTcLD6cOao82TaWefPXQvB2fOC4AjuYSEndS7N/mTCbkdQ==}
@@ -2892,6 +3031,10 @@ packages:
   undici-types@5.26.5:
     resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
 
+  undici@6.20.1:
+    resolution: {integrity: sha512-AjQF1QsmqfJys+LXfGTNum+qw4S88CojRInG/6t31W/1fk6G59s92bnAvGz5Cmur+kQv2SURXEvvudLmbrE8QA==}
+    engines: {node: '>=18.17'}
+
   unpipe@1.0.0:
     resolution: {integrity: sha512-pjy2bYhSsufwWlKwPc+l3cN7+wuJlK6uz0YdJEOlQDbl6jo/YlPi4mb8agUkVC8BF7V8NuzeyPNqRksA3hztKQ==}
     engines: {node: '>= 0.8'}
@@ -2942,6 +3085,14 @@ packages:
   webidl-conversions@3.0.1:
     resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}
 
+  whatwg-encoding@3.1.1:
+    resolution: {integrity: sha512-6qN4hJdMwfYBtE3YBTTHhoeuUrDBPZmbQaxWAqSALV/MeEnR5z1xd8UKud2RAkFoPkmB+hli1TZSnyi84xz1vQ==}
+    engines: {node: '>=18'}
+
+  whatwg-mimetype@4.0.0:
+    resolution: {integrity: sha512-QaKxh0eNIi2mE9p2vEdzfagOKHCcj1pJ56EEHGQOVxp8r9/iszLUUV7v89x9O1p/T+NlTM5W7jW6+cz4Fq1YVg==}
+    engines: {node: '>=18'}
+
   whatwg-url@5.0.0:
     resolution: {integrity: sha512-saE57nupxk6v3HY35+jzBwYa0rKSy0XR8JSxZPwgLr7ys0IBzhGviA1/TUGJLmSVqs8pb9AnvICXEuOHLprYTw==}
 
@@ -2986,6 +3137,9 @@ packages:
 
   yallist@3.1.1:
     resolution: {integrity: sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g==}
+
+  yallist@4.0.0:
+    resolution: {integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==}
 
   yaml@2.4.5:
     resolution: {integrity: sha512-aBx2bnqDzVOyNKfsysjA2ms5ZlnjSAW2eG3/L5G/CSujfjLJTJsEw1bGw8kCf04KodQWk1pxlGnZ56CRxiawmg==}
@@ -3273,6 +3427,8 @@ snapshots:
 
   '@humanwhocodes/object-schema@2.0.3': {}
 
+  '@ioredis/commands@1.2.0': {}
+
   '@istanbuljs/load-nyc-config@1.1.0':
     dependencies:
       camelcase: 5.3.1
@@ -3467,13 +3623,13 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.4.15
 
-  '@langchain/core@0.2.15(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1))(openai@4.52.4)':
+  '@langchain/core@0.2.15(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1))(openai@4.52.4)':
     dependencies:
       ansi-styles: 5.2.0
       camelcase: 6.3.0
       decamelize: 1.2.0
       js-tiktoken: 1.0.12
-      langsmith: 0.1.36(@langchain/core@0.2.15(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1))(openai@4.52.4))(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1))(openai@4.52.4)
+      langsmith: 0.1.36(@langchain/core@0.2.15(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1))(openai@4.52.4))(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1))(openai@4.52.4)
       ml-distance: 4.0.1
       mustache: 4.2.0
       p-queue: 6.6.2
@@ -3485,13 +3641,13 @@ snapshots:
       - langchain
       - openai
 
-  '@langchain/core@0.2.16(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1))(openai@4.52.4)':
+  '@langchain/core@0.2.16(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1))(openai@4.52.4)':
     dependencies:
       ansi-styles: 5.2.0
       camelcase: 6.3.0
       decamelize: 1.2.0
       js-tiktoken: 1.0.12
-      langsmith: 0.1.36(@langchain/core@0.2.16(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1))(openai@4.52.4))(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1))(openai@4.52.4)
+      langsmith: 0.1.36(@langchain/core@0.2.16(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1))(openai@4.52.4))(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1))(openai@4.52.4)
       ml-distance: 4.0.1
       mustache: 4.2.0
       p-queue: 6.6.2
@@ -3505,8 +3661,8 @@ snapshots:
 
   '@langchain/groq@0.0.13(langchain@0.2.11)(openai@4.52.4)':
     dependencies:
-      '@langchain/core': 0.2.15(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1))(openai@4.52.4)
-      '@langchain/openai': 0.1.3(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1))
+      '@langchain/core': 0.2.15(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1))(openai@4.52.4)
+      '@langchain/openai': 0.1.3(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1))
       groq-sdk: 0.3.3
       zod: 3.23.8
       zod-to-json-schema: 3.23.1(zod@3.23.8)
@@ -3515,9 +3671,9 @@ snapshots:
       - langchain
       - openai
 
-  '@langchain/openai@0.1.3(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1))':
+  '@langchain/openai@0.1.3(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1))':
     dependencies:
-      '@langchain/core': 0.2.15(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1))(openai@4.52.4)
+      '@langchain/core': 0.2.15(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1))(openai@4.52.4)
       js-tiktoken: 1.0.12
       openai: 4.52.4
       zod: 3.23.8
@@ -3526,9 +3682,9 @@ snapshots:
       - encoding
       - langchain
 
-  '@langchain/openai@0.2.2(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1))':
+  '@langchain/openai@0.2.2(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1))':
     dependencies:
-      '@langchain/core': 0.2.16(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1))(openai@4.52.4)
+      '@langchain/core': 0.2.16(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1))(openai@4.52.4)
       js-tiktoken: 1.0.12
       openai: 4.52.4
       zod: 3.23.8
@@ -3537,9 +3693,9 @@ snapshots:
       - encoding
       - langchain
 
-  '@langchain/textsplitters@0.0.3(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1))(openai@4.52.4)':
+  '@langchain/textsplitters@0.0.3(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1))(openai@4.52.4)':
     dependencies:
-      '@langchain/core': 0.2.16(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1))(openai@4.52.4)
+      '@langchain/core': 0.2.16(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1))(openai@4.52.4)
       js-tiktoken: 1.0.12
     transitivePeerDependencies:
       - langchain
@@ -3581,6 +3737,32 @@ snapshots:
   '@prisma/get-platform@5.16.2':
     dependencies:
       '@prisma/debug': 5.16.2
+
+  '@redis/bloom@1.2.0(@redis/client@1.6.0)':
+    dependencies:
+      '@redis/client': 1.6.0
+
+  '@redis/client@1.6.0':
+    dependencies:
+      cluster-key-slot: 1.1.2
+      generic-pool: 3.9.0
+      yallist: 4.0.0
+
+  '@redis/graph@1.1.1(@redis/client@1.6.0)':
+    dependencies:
+      '@redis/client': 1.6.0
+
+  '@redis/json@1.0.7(@redis/client@1.6.0)':
+    dependencies:
+      '@redis/client': 1.6.0
+
+  '@redis/search@1.2.0(@redis/client@1.6.0)':
+    dependencies:
+      '@redis/client': 1.6.0
+
+  '@redis/time-series@1.1.0(@redis/client@1.6.0)':
+    dependencies:
+      '@redis/client': 1.6.0
 
   '@sinclair/typebox@0.27.8': {}
 
@@ -3624,6 +3806,10 @@ snapshots:
   '@types/body-parser@1.19.5':
     dependencies:
       '@types/connect': 3.4.38
+      '@types/node': 20.14.9
+
+  '@types/cheerio@0.22.35':
+    dependencies:
       '@types/node': 20.14.9
 
   '@types/connect@3.4.38':
@@ -4059,6 +4245,8 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  boolbase@1.0.0: {}
+
   brace-expansion@1.1.11:
     dependencies:
       balanced-match: 1.0.2
@@ -4124,6 +4312,29 @@ snapshots:
 
   charenc@0.0.2: {}
 
+  cheerio-select@2.1.0:
+    dependencies:
+      boolbase: 1.0.0
+      css-select: 5.1.0
+      css-what: 6.1.0
+      domelementtype: 2.3.0
+      domhandler: 5.0.3
+      domutils: 3.1.0
+
+  cheerio@1.0.0:
+    dependencies:
+      cheerio-select: 2.1.0
+      dom-serializer: 2.0.0
+      domhandler: 5.0.3
+      domutils: 3.1.0
+      encoding-sniffer: 0.2.0
+      htmlparser2: 9.1.0
+      parse5: 7.2.0
+      parse5-htmlparser2-tree-adapter: 7.1.0
+      parse5-parser-stream: 7.1.2
+      undici: 6.20.1
+      whatwg-mimetype: 4.0.0
+
   chokidar@3.6.0:
     dependencies:
       anymatch: 3.1.3
@@ -4145,6 +4356,8 @@ snapshots:
       string-width: 4.2.3
       strip-ansi: 6.0.1
       wrap-ansi: 7.0.0
+
+  cluster-key-slot@1.1.2: {}
 
   co@4.6.0: {}
 
@@ -4220,6 +4433,16 @@ snapshots:
 
   crypt@0.0.2: {}
 
+  css-select@5.1.0:
+    dependencies:
+      boolbase: 1.0.0
+      css-what: 6.1.0
+      domhandler: 5.0.3
+      domutils: 3.1.0
+      nth-check: 2.1.1
+
+  css-what@6.1.0: {}
+
   data-view-buffer@1.0.1:
     dependencies:
       call-bind: 1.0.7
@@ -4274,6 +4497,8 @@ snapshots:
 
   delayed-stream@1.0.0: {}
 
+  denque@2.1.0: {}
+
   depd@2.0.0: {}
 
   destroy@1.2.0: {}
@@ -4306,6 +4531,24 @@ snapshots:
     dependencies:
       esutils: 2.0.3
 
+  dom-serializer@2.0.0:
+    dependencies:
+      domelementtype: 2.3.0
+      domhandler: 5.0.3
+      entities: 4.5.0
+
+  domelementtype@2.3.0: {}
+
+  domhandler@5.0.3:
+    dependencies:
+      domelementtype: 2.3.0
+
+  domutils@3.1.0:
+    dependencies:
+      dom-serializer: 2.0.0
+      domelementtype: 2.3.0
+      domhandler: 5.0.3
+
   dotenv@16.4.5: {}
 
   ecdsa-sig-formatter@1.0.11:
@@ -4322,10 +4565,17 @@ snapshots:
 
   encodeurl@1.0.2: {}
 
+  encoding-sniffer@0.2.0:
+    dependencies:
+      iconv-lite: 0.6.3
+      whatwg-encoding: 3.1.1
+
   enhanced-resolve@5.17.0:
     dependencies:
       graceful-fs: 4.2.11
       tapable: 2.2.1
+
+  entities@4.5.0: {}
 
   error-ex@1.3.2:
     dependencies:
@@ -4752,6 +5002,8 @@ snapshots:
 
   functions-have-names@1.2.3: {}
 
+  generic-pool@3.9.0: {}
+
   gensync@1.0.0-beta.2: {}
 
   get-caller-file@2.0.5: {}
@@ -4878,6 +5130,13 @@ snapshots:
 
   html-escaper@2.0.2: {}
 
+  htmlparser2@9.1.0:
+    dependencies:
+      domelementtype: 2.3.0
+      domhandler: 5.0.3
+      domutils: 3.1.0
+      entities: 4.5.0
+
   http-errors@2.0.0:
     dependencies:
       depd: 2.0.0
@@ -4893,6 +5152,10 @@ snapshots:
       ms: 2.1.3
 
   iconv-lite@0.4.24:
+    dependencies:
+      safer-buffer: 2.1.2
+
+  iconv-lite@0.6.3:
     dependencies:
       safer-buffer: 2.1.2
 
@@ -4924,6 +5187,20 @@ snapshots:
       es-errors: 1.3.0
       hasown: 2.0.2
       side-channel: 1.0.6
+
+  ioredis@5.4.1:
+    dependencies:
+      '@ioredis/commands': 1.2.0
+      cluster-key-slot: 1.1.2
+      debug: 4.3.5(supports-color@5.5.0)
+      denque: 2.1.0
+      lodash.defaults: 4.2.0
+      lodash.isarguments: 3.1.0
+      redis-errors: 1.2.0
+      redis-parser: 3.0.0
+      standard-as-callback: 2.1.0
+    transitivePeerDependencies:
+      - supports-color
 
   ipaddr.js@1.9.1: {}
 
@@ -5429,17 +5706,17 @@ snapshots:
 
   kleur@3.0.3: {}
 
-  langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1):
+  langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1):
     dependencies:
-      '@langchain/core': 0.2.16(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1))(openai@4.52.4)
-      '@langchain/openai': 0.2.2(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1))
-      '@langchain/textsplitters': 0.0.3(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1))(openai@4.52.4)
+      '@langchain/core': 0.2.16(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1))(openai@4.52.4)
+      '@langchain/openai': 0.2.2(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1))
+      '@langchain/textsplitters': 0.0.3(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1))(openai@4.52.4)
       binary-extensions: 2.3.0
       js-tiktoken: 1.0.12
       js-yaml: 4.1.0
       jsonpointer: 5.0.1
       langchainhub: 0.0.11
-      langsmith: 0.1.36(@langchain/core@0.2.16(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1))(openai@4.52.4))(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1))(openai@4.52.4)
+      langsmith: 0.1.36(@langchain/core@0.2.16(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1))(openai@4.52.4))(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1))(openai@4.52.4)
       ml-distance: 4.0.1
       openapi-types: 12.1.3
       p-retry: 4.6.2
@@ -5450,7 +5727,10 @@ snapshots:
     optionalDependencies:
       '@langchain/groq': 0.0.13(langchain@0.2.11)(openai@4.52.4)
       axios: 1.7.2
+      cheerio: 1.0.0
       ignore: 5.3.1
+      ioredis: 5.4.1
+      redis: 4.7.0
       youtube-transcript: 1.2.1
     transitivePeerDependencies:
       - encoding
@@ -5458,7 +5738,7 @@ snapshots:
 
   langchainhub@0.0.11: {}
 
-  langsmith@0.1.36(@langchain/core@0.2.15(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1))(openai@4.52.4))(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1))(openai@4.52.4):
+  langsmith@0.1.36(@langchain/core@0.2.15(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1))(openai@4.52.4))(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1))(openai@4.52.4):
     dependencies:
       '@types/uuid': 9.0.8
       commander: 10.0.1
@@ -5466,11 +5746,11 @@ snapshots:
       p-retry: 4.6.2
       uuid: 9.0.1
     optionalDependencies:
-      '@langchain/core': 0.2.15(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1))(openai@4.52.4)
-      langchain: 0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1)
+      '@langchain/core': 0.2.15(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1))(openai@4.52.4)
+      langchain: 0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1)
       openai: 4.52.4
 
-  langsmith@0.1.36(@langchain/core@0.2.16(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1))(openai@4.52.4))(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1))(openai@4.52.4):
+  langsmith@0.1.36(@langchain/core@0.2.16(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1))(openai@4.52.4))(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1))(openai@4.52.4):
     dependencies:
       '@types/uuid': 9.0.8
       commander: 10.0.1
@@ -5478,8 +5758,8 @@ snapshots:
       p-retry: 4.6.2
       uuid: 9.0.1
     optionalDependencies:
-      '@langchain/core': 0.2.16(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1))(openai@4.52.4)
-      langchain: 0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(ignore@5.3.1)(openai@4.52.4)(youtube-transcript@1.2.1)
+      '@langchain/core': 0.2.16(langchain@0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1))(openai@4.52.4)
+      langchain: 0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(youtube-transcript@1.2.1)
       openai: 4.52.4
 
   leven@3.1.0: {}
@@ -5499,7 +5779,11 @@ snapshots:
     dependencies:
       p-locate: 5.0.0
 
+  lodash.defaults@4.2.0: {}
+
   lodash.includes@4.3.0: {}
+
+  lodash.isarguments@3.1.0: {}
 
   lodash.isboolean@3.0.3: {}
 
@@ -5646,6 +5930,10 @@ snapshots:
     dependencies:
       path-key: 3.1.1
 
+  nth-check@2.1.1:
+    dependencies:
+      boolbase: 1.0.0
+
   num-sort@2.1.0: {}
 
   oauth@0.10.0: {}
@@ -5775,6 +6063,19 @@ snapshots:
       json-parse-even-better-errors: 2.3.1
       lines-and-columns: 1.2.4
 
+  parse5-htmlparser2-tree-adapter@7.1.0:
+    dependencies:
+      domhandler: 5.0.3
+      parse5: 7.2.0
+
+  parse5-parser-stream@7.1.2:
+    dependencies:
+      parse5: 7.2.0
+
+  parse5@7.2.0:
+    dependencies:
+      entities: 4.5.0
+
   parseurl@1.3.3: {}
 
   passport-google-oauth20@2.0.0:
@@ -5884,6 +6185,21 @@ snapshots:
   readdirp@3.6.0:
     dependencies:
       picomatch: 2.3.1
+
+  redis-errors@1.2.0: {}
+
+  redis-parser@3.0.0:
+    dependencies:
+      redis-errors: 1.2.0
+
+  redis@4.7.0:
+    dependencies:
+      '@redis/bloom': 1.2.0(@redis/client@1.6.0)
+      '@redis/client': 1.6.0
+      '@redis/graph': 1.1.1(@redis/client@1.6.0)
+      '@redis/json': 1.0.7(@redis/client@1.6.0)
+      '@redis/search': 1.2.0(@redis/client@1.6.0)
+      '@redis/time-series': 1.1.0(@redis/client@1.6.0)
 
   regexp.prototype.flags@1.5.2:
     dependencies:
@@ -6029,6 +6345,8 @@ snapshots:
   stack-utils@2.0.6:
     dependencies:
       escape-string-regexp: 2.0.0
+
+  standard-as-callback@2.1.0: {}
 
   statuses@2.0.1: {}
 
@@ -6247,6 +6565,8 @@ snapshots:
 
   undici-types@5.26.5: {}
 
+  undici@6.20.1: {}
+
   unpipe@1.0.0: {}
 
   update-browserslist-db@1.1.0(browserslist@4.23.1):
@@ -6284,6 +6604,12 @@ snapshots:
   web-streams-polyfill@4.0.0-beta.3: {}
 
   webidl-conversions@3.0.1: {}
+
+  whatwg-encoding@3.1.1:
+    dependencies:
+      iconv-lite: 0.6.3
+
+  whatwg-mimetype@4.0.0: {}
 
   whatwg-url@5.0.0:
     dependencies:
@@ -6335,6 +6661,8 @@ snapshots:
   y18n@5.0.8: {}
 
   yallist@3.1.1: {}
+
+  yallist@4.0.0: {}
 
   yaml@2.4.5: {}
 

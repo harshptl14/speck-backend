@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Progress" ALTER COLUMN "topicId" DROP DEFAULT,
+ALTER COLUMN "subtopicId" DROP DEFAULT;

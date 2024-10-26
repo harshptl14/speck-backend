@@ -1,4 +1,5 @@
-import prisma from "../../../utils/client";
+import { ProgressStatus } from "@prisma/client";
+import { prisma } from "../../../utils/client";
 
 export const getUserRoadmaps = async (userId: number) => {
     console.log('userId: in userRoadmaps services:', userId);
@@ -92,6 +93,7 @@ export const getTopicsByIdService = async (roadmapId: number) => {
                     select: {
                         name: true,
                         id: true,
+                        progress: true,
                     }
                 }
             }
@@ -171,3 +173,217 @@ export const getSubTopicByIdService = async (subtopicId: number) => {
         throw error;
     }
 }
+
+
+export const getRoadmapsInfoByUserIdService = async (userId: number) => {
+    try {
+
+        const totalRoadmapIds = await prisma.roadmap.findMany({
+            where: {
+                userId: userId,
+            },
+            select: {
+                id: true,
+            },
+        });
+
+        const completedRoadmapIds = await prisma.progress.findMany({
+            where: {
+                userId: userId,
+                status: 'COMPLETED',
+            },
+            select: {
+                roadmapId: true,
+            },
+        });
+
+        const favoriteRoadmapIds = await prisma.favorite.findMany({
+            where: {
+                userId: userId,
+            },
+            select: {
+                roadmapId: true,
+            },
+        });
+
+        const userRoadmaps = await prisma.roadmap.findMany({
+            where: {
+                userId: userId
+            },
+            select: {
+                id: true,
+                name: true,
+                progress: {
+                    select: {
+                        status: true
+                    }
+                }
+            }
+        });
+
+        const courses = userRoadmaps.map(roadmap => {
+            const completedTopics = roadmap.progress.filter(p => p.status === 'COMPLETED').length;
+            const totalTopics = roadmap.progress.length;
+            const progress = totalTopics > 0 ? Math.round((completedTopics / totalTopics) * 100) : 0;
+
+            return {
+                id: roadmap.id,
+                name: roadmap.name,
+                progress: progress
+            };
+        });
+
+        return {
+            totalRoadmapIds,
+            completedRoadmapIds,
+            favoriteRoadmapIds,
+            courses
+        };
+
+    } catch (error) {
+        console.error('Error getting roadmapsInfo by userId:', error);
+        throw error;
+    }
+}
+
+export const updateSubtopicCompletionService = async (
+    roadmapId: number,
+    topicId: number,
+    subtopicId: number,
+    newStatus: ProgressStatus,
+    userId: number
+) => {
+    try {
+        await prisma.$transaction(async (tx) => {
+            // Update the status of the subtopic in the Progress table
+            await tx.progress.upsert({
+                where: {
+                    userId_roadmapId_topicId_subtopicId: {
+                        userId,
+                        roadmapId,
+                        topicId,
+                        subtopicId,
+                    },
+                },
+                update: { status: newStatus },
+                create: {
+                    userId,
+                    roadmapId,
+                    topicId,
+                    subtopicId,
+                    status: newStatus,
+                },
+            });
+
+            if (newStatus === ProgressStatus.COMPLETED) {
+                // Check if all subtopics in the topic are completed
+                const subtopics = await tx.subtopic.findMany({ where: { topicId } });
+                const completedSubtopics = await tx.progress.findMany({
+                    where: {
+                        userId,
+                        roadmapId,
+                        topicId,
+                        status: ProgressStatus.COMPLETED,
+                    },
+                });
+
+                if (subtopics.length === completedSubtopics.length) {
+                    // Update topic progress
+                    await tx.progress.upsert({
+                        where: {
+                            userId_roadmapId_topicId_subtopicId: {
+                                userId,
+                                roadmapId,
+                                topicId,
+                                subtopicId: 0,
+                            },
+                        },
+                        update: { status: ProgressStatus.COMPLETED },
+                        create: {
+                            userId,
+                            roadmapId,
+                            topicId,
+                            status: ProgressStatus.COMPLETED,
+                        },
+                    });
+
+                    // Check if all topics in the roadmap are completed
+                    const topics = await tx.topic.findMany({ where: { roadmapId } });
+                    const completedTopics = await tx.progress.findMany({
+                        where: {
+                            userId,
+                            roadmapId,
+                            // topicId: null,
+                            subtopicId: 0,
+                            status: ProgressStatus.COMPLETED,
+                        },
+                    });
+
+                    console.log('topics:', topics);
+                    console.log('completedTopics:', completedTopics);
+
+
+                    if (topics.length === completedTopics.length) {
+                        console.log('All topics are completed', topics.length === completedTopics.length);
+
+                        await tx.progress.upsert({
+                            where: {
+                                userId_roadmapId_topicId_subtopicId: {
+                                    userId,
+                                    roadmapId,
+                                    topicId: 0,
+                                    subtopicId: 0,
+                                },
+                            },
+                            update: { status: ProgressStatus.COMPLETED },
+                            create: {
+                                userId,
+                                roadmapId,
+                                status: ProgressStatus.COMPLETED,
+                            },
+                        });
+                    }
+                }
+            } else {
+                // Handle cases for NOT_STARTED or IN_PROGRESS
+                await tx.progress.upsert({
+                    where: {
+                        userId_roadmapId_topicId_subtopicId: {
+                            userId,
+                            roadmapId,
+                            topicId,
+                            subtopicId: 0,
+                        },
+                    },
+                    update: { status: ProgressStatus.IN_PROGRESS },
+                    create: {
+                        userId,
+                        roadmapId,
+                        topicId,
+                        status: ProgressStatus.IN_PROGRESS,
+                    },
+                });
+
+                await tx.progress.upsert({
+                    where: {
+                        userId_roadmapId_topicId_subtopicId: {
+                            userId,
+                            roadmapId,
+                            topicId: 0,
+                            subtopicId: 0,
+                        },
+                    },
+                    update: { status: ProgressStatus.IN_PROGRESS },
+                    create: {
+                        userId,
+                        roadmapId,
+                        status: ProgressStatus.IN_PROGRESS,
+                    },
+                });
+            }
+        });
+    } catch (error) {
+        console.error('Error updating subtopic completion:', error);
+        throw error;
+    }
+};

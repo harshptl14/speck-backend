@@ -2,8 +2,10 @@ import { Request, Response } from 'express';
 import { createRoadmapService } from '../services/roadmap.service/roadmap.service';
 import { createRoadmapFunction } from '../services/roadmap.service/roadmapLongchain.service';
 import { getRoadmapTitleService } from '../services/roadmap.service/getRoadmapTitle.service';
-import { getRoadmapByIdService, getUserRoadmaps, getTopicsByIdService, getSubTopicByIdService } from '../services/roadmap.service/userRoadmaps.service';
-import { createRoadmapSchema, getRoadmapByIdSchema, getRoadmapTitleSchema, getRoadmapOutlineSchema } from '../models/roadmapSchemas';
+import { getRoadmapByIdService, getUserRoadmaps, getTopicsByIdService, getSubTopicByIdService, updateSubtopicCompletionService, getRoadmapsInfoByUserIdService } from '../services/roadmap.service/userRoadmaps.service';
+import { createRoadmapSchema, createSubtopicContentSchema, getRoadmapByIdSchema, getRoadmapTitleSchema, getRoadmapOutlineSchema, updateSubtopicCompletionSchema, getRoadmapsInfoByUserIdSchema } from '../models/roadmapSchemas';
+import { createSubtopicContentService } from '../services/roadmap.service/contentScrap.service';
+import { redisClient } from '../../utils/client';
 
 interface User {
     id: number;
@@ -12,7 +14,7 @@ interface User {
     createdAt: Date,
     updatedAt: Date,
 }
-
+// Write Controllers
 export const createRoadmap = async (req: Request, res: Response) => {
     const user = req?.user as User;
 
@@ -32,6 +34,44 @@ export const createRoadmap = async (req: Request, res: Response) => {
     }
 };
 
+export const createSubtopicContent = async (req: Request, res: Response) => {
+    const validationResult = createSubtopicContentSchema.safeParse(req.body);
+    if (!validationResult.success) {
+        return res.status(400).json({ errors: validationResult.error.errors });
+    }
+
+    console.log('req.body', req.body);
+
+
+    const subtopicId = Number(req.body.subtopicId);
+    const roadmapId = Number(req.body.roadmapId)
+    const jobId = req.body.jobId;
+
+    console.log('roadmapId', subtopicId);
+
+    try {
+        const response = await createSubtopicContentService(subtopicId, roadmapId, jobId);
+        res.status(200).json({
+            message: response,
+        });
+    } catch (error) {
+        console.error('Error getting response:', error);
+        res.status(500).json({
+            message: 'Failed to get response',
+        });
+    }
+}
+
+export const getSubtopicGenerationProgress = async (req: Request, res: Response) => {
+    const { jobId } = req.params;
+    const progress = await redisClient.get(`progress:${jobId}`);
+    if (progress) {
+        res.json({ progress: parseInt(progress) });
+    } else {
+        res.status(404).json({ message: 'Progress not found' });
+    }
+}
+
 export const getMyRoadmaps = async (req: Request, res: Response) => {
     try {
         const user = req?.user as User;
@@ -49,6 +89,7 @@ export const getMyRoadmaps = async (req: Request, res: Response) => {
     }
 };
 
+// Read Controllers
 export const getRoadmapById = async (req: Request, res: Response) => {
     const validationResult = getRoadmapByIdSchema.safeParse(req.params);
     if (!validationResult.success) {
@@ -151,3 +192,47 @@ export const getRoadmapOutline = async (req: Request, res: Response) => {
         });
     }
 }
+
+
+export const getRoadmapsInfoByUserId = async (req: Request, res: Response) => {
+    const validationResult = getRoadmapsInfoByUserIdSchema.safeParse(req.params);
+  
+    if (!validationResult.success) {
+        return res.status(400).json({ errors: validationResult.error.errors });
+    }
+      const userId = Number(req.params.id);
+    try {
+        const roadmapsInfo = await getRoadmapsInfoByUserIdService(userId);
+        res.status(200).json({
+            message: 'Roadmaps info retrieved successfully',
+            data: roadmapsInfo,
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: `Failed to get Roadmaps info, ${error}`,
+            error: error,
+        });
+    }
+};
+
+export const updateSubtopicCompletion = async (req: Request, res: Response) => {
+    const validationResult = updateSubtopicCompletionSchema.safeParse(req.body);
+    if (!validationResult.success) {
+        return res.status(400).json({ errors: validationResult.error.errors });
+    }
+    const { topicId, subtopicId, newStatus, roadmapId } = req.body;
+    try {
+        const user = req?.user as User;
+        const response = await updateSubtopicCompletionService(roadmapId, topicId, subtopicId, newStatus, user.id);
+        res.status(200).json({
+            message: 'Subtopic completion status updated successfully',
+            data: response,
+        });
+    } catch (error) {
+        console.error('Error updating subtopic completion:', error);
+        res.status(500).json({
+            message: 'Failed to update subtopic completion',
+            error: error,
+        });
+    }
+};

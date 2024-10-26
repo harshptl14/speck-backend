@@ -4,9 +4,9 @@ import { parseStringPromise } from "xml2js";
 import { groqModel } from "../../configs/longchain.config";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { Topic, Prisma, Subtopic } from "@prisma/client";
-import prisma from "../../../utils/client";
+import { prisma } from "../../../utils/client";
 import axios from 'axios';
-import { time } from "console";
+import { redisClient } from "../../../utils/client";
 
 
 // Old way to gathering video and text data
@@ -76,9 +76,7 @@ async function createVideoQuery(roadmapName: string | undefined, topicName: stri
     // Return the answer
 
     const getVideoQuery = PromptTemplate.fromTemplate(`
-    Please provide a YouTube video query for the following:
-        - Roadmap name: {roadmap}
-        - Topic name: {topic} in {roadmap}
+    Please provide a YouTube video query for the following subtopic name:
         - Subtopic name: {subtopic}
     
     Output only the query string nothing else, JUST STRING WITH QUERY. Ensure the query is optimized to retrieve the most relevant video content.
@@ -245,7 +243,7 @@ export const populateFirstRoadmapTopic = async (roadmapID: number) => {
         const videoTranscripts = await Promise.all(transcriptPromisesForVideos);
 
         // return transcripts;
-        const shortsLinks = await getVideoLinks(videoQuery, "short");
+        const shortsLinks = await getVideoLinks(videoQuery + "#shorts", "short");
 
         const transcriptPromisesForShorts = shortsLinks.map(async (video) => {
             const link = `https://www.youtube.com/shorts/${video.link}`;
@@ -387,6 +385,7 @@ const createTextContent = async (roadmap: RoadmapWithTopicsAndSubtopics | null, 
         5. Address common misconceptions or challenges
         6. Relate the subtopic to the main topic and other relevant topics in the course
         7. Conclude with a summary and its significance in the broader context of ${roadmap}
+        8. Don't put subtopic title at top. Generate content directly without including the subtopic name as a heading.
 
         Format:
         - Use Markdown formatting
@@ -429,28 +428,83 @@ const getVideoLinks = async (query: string, type: string): Promise<videoDetails[
     const maxAttempts = 3;
     let attempts = 0;
 
+    function convertDurationToSeconds(duration: any) {
+        let totalSeconds = 0;
+
+        // Regex to extract hours, minutes, and seconds from ISO 8601 duration format
+        const regex = /PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/;
+        const matches = duration.match(regex);
+
+        const hours = parseInt(matches[1] || 0); // Extract hours (if present)
+        const minutes = parseInt(matches[2] || 0); // Extract minutes (if present)
+        const seconds = parseInt(matches[3] || 0); // Extract seconds (if present)
+
+        // Convert to seconds and sum
+        totalSeconds += hours * 3600; // 1 hour = 3600 seconds
+        totalSeconds += minutes * 60; // 1 minute = 60 seconds
+        totalSeconds += seconds; // Add seconds
+
+        return totalSeconds;
+    }
+
     while (attempts < maxAttempts) {
         try {
+
+            console.log("------ scraping video links for query------:", query);
+
             const QUERY = encodeURIComponent(query);
             const videoType = type;
             const order = 'relevance';
-            const url = `https://yt.lemnoslife.com/search?part=id,snippet&q=${QUERY}&type=${videoType}&order=${order}`;
+            // const url = `https://yt.lemnoslife.com/search?part=id,snippet&q=${QUERY}&type=${videoType}&order=${order}`;
+            const url = `https://www.googleapis.com/youtube/v3/search?part=id,snippet&q=${QUERY}&type=${videoType}&order=${order}&key=${process.env.YOUTUBE_API_KEY}`;
+            // 
+
+            // const response = await axios.get(url);
+
+            // console.log('Response:', response.data);
+
+
+            // // Process the response data
+            // const videoLinks: videoDetails[] = response.data.items
+            //     .slice(0, 5) // Only store the first 5 videos
+            //     .map((item: any) => {
+            //         return {
+            //             name: item.snippet.title,
+            //             link: item.id.videoId,
+            //             duration: item.snippet.duration,
+            //             thumbnail: item.snippet.thumbnails[0].url,
+            //         };
+            //     });
 
             const response = await axios.get(url);
+            const videos = response.data.items;
 
-            // Process the response data
-            const videoLinks: videoDetails[] = response.data.items
-                .slice(0, 5) // Only store the first 5 videos
-                .map((item: any) => {
-                    return {
-                        name: item.snippet.title,
-                        link: item.id.videoId,
-                        duration: item.snippet.duration,
-                        thumbnail: item.snippet.thumbnails[0].url,
-                    };
-                });
+            const videoDetails = await Promise.all(videos.map(async (video: any) => {
+                const videoId = video.id.videoId;
+                const title = video.snippet.title;
+                const thumbnail = video.snippet.thumbnails.default.url;
+                // const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
 
-            return videoLinks;
+                // Get video duration from 'videos' endpoint
+                const videoDetailsUrl = `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&part=contentDetails&key=${process.env.YOUTUBE_API_KEY}`;
+                const videoDetailsResponse = await axios.get(videoDetailsUrl);
+
+                const length = videoDetailsResponse.data.items[0].contentDetails.duration || 0;
+                const duration = convertDurationToSeconds(length);
+
+
+                return {
+                    name: title,
+                    link: videoId,
+                    duration: duration,
+                    thumbnail: thumbnail
+                };
+            }));
+
+            console.log("video details======>", videoDetails);
+
+
+            return videoDetails;
         } catch (error) {
             console.error(`Error fetching video links (attempt ${attempts + 1}):`, error);
             attempts++;
@@ -467,4 +521,161 @@ const getVideoLinks = async (query: string, type: string): Promise<videoDetails[
 
     // This line should never be reached, but TypeScript might require it
     return [];
+};
+
+
+export const createSubtopicContentService = async (subtopicId: number, roadmapId: number, jobId: string) => {
+
+    const updateProgress = async (percentage: number) => {
+        await redisClient.set(`progress:${jobId}`, percentage.toString());  // Store progress in Redis
+    };
+
+    await updateProgress(10);  // 10%: Start of the process
+
+    try {
+        const subtopic = await prisma.subtopic.findUnique({
+            where: {
+                id: subtopicId
+            }
+        });
+
+        // get topic using subtopic
+        const topic = await prisma.topic.findUnique({
+            where: {
+                id: subtopic?.topicId
+            }
+        });
+
+        const roadmap = await prisma.roadmap.findUnique({
+            where: {
+                id: roadmapId
+            },
+            include: {
+                topics: {
+                    include: {
+                        subtopics: true
+                    }
+                }
+            }
+        });
+
+        console.log('Creating content for subtopic:-------->', subtopic, subtopic?.name);
+        console.log('Roadmap details:', roadmap);
+
+        await updateProgress(25);  // 25%: Fetched subtopic and topic
+
+
+
+        // const subtopicMarkdownContent = await createTextContent(roadmap, subtopic.topic, subtopic);
+        const subtopicMarkdownContent = await createTextContent(roadmap, undefined, subtopic as Subtopic);
+
+        await updateProgress(40);  // 40%: Fetched roadmap and details
+
+
+        // get video links and transcripts for the subtopic
+        const videoQuery = await createVideoQuery(roadmap?.name, topic?.name, subtopic?.name);
+
+        await updateProgress(55);  // 55%: Generated markdown content
+
+        const videoLinks = await getVideoLinks(videoQuery, "video");
+
+        await updateProgress(70);  // 70%: Fetched video links
+
+
+        const transcriptPromisesForVideos = videoLinks.map(async (video) => {
+            const link = `https://www.youtube.com/watch?v=${video.link}`;
+            const transcript = await getYoutubeTranscript(link);
+            return {
+                videoId: video.link,
+                transcript: transcript
+            };
+        });
+
+        const videoTranscripts = await Promise.all(transcriptPromisesForVideos);
+
+        // return transcripts;
+        const shortsLinks = await getVideoLinks(videoQuery + "#shorts", "short");
+
+        const transcriptPromisesForShorts = shortsLinks.map(async (video) => {
+            const link = `https://www.youtube.com/shorts/${video.link}`;
+            const transcript = await getYoutubeTranscript(link);
+            return {
+                videoId: video.link,
+                transcript: transcript
+            };
+        });
+
+        const shortTranscripts = await Promise.all(transcriptPromisesForShorts);
+
+        await updateProgress(90);  // 90%: Fetched short video transcripts
+
+
+        // store these data in the DB
+        try {
+            const videoContentPromises = videoLinks.map(async (video, index) => {
+                await prisma.videoContent.create({
+                    data: {
+                        topic: {
+                            connect: { id: topic!.id } // Ensure topic is connected
+                        },
+                        subtopic: {
+                            connect: { id: subtopicId } // Ensure subtopic is connected
+                        },
+                        name: video.name,
+                        duration: Number(video.duration) || 0, // Ensure duration is a number
+                        link: video.link,
+                        transcript: videoTranscripts[index]?.transcript || "", // Ensure transcript is a string
+                        summary: "",
+                        videoType: 'VIDEO',
+                        thumbnail: video.thumbnail,
+                    },
+                });
+            });
+
+            const shortsContentPromises = shortsLinks.map(async (video, index) => {
+                await prisma.videoContent.create({
+                    data: {
+                        topic: {
+                            connect: { id: topic!.id } // Ensure topic is connected
+                        },
+                        subtopic: {
+                            connect: { id: subtopicId } // Ensure subtopic is connected
+                        },
+                        name: video.name,
+                        duration: Number(video.duration) || 0, // Ensure duration is a number
+                        link: video.link,
+                        transcript: shortTranscripts[index]?.transcript || "", // Ensure transcript is a string
+                        summary: "",
+                        videoType: 'SHORTS',
+                        thumbnail: video.thumbnail
+                    },
+                });
+            }
+
+            );
+
+            const textContentPromise = prisma.textContent.create({
+                data: {
+                    topicId: subtopic!.topicId,
+                    subtopicId: subtopic!.id,
+                    title: "Title of the text content",
+                    content: subtopicMarkdownContent as string,
+                },
+            });
+
+            await Promise.all([...videoContentPromises, textContentPromise]);
+        }
+        catch (error) {
+            console.error('Error inserting data:', error);
+        }
+        finally {
+            console.log('Content created for subtopic:', subtopic?.name);
+            // await prisma.$disconnect();
+        }
+        await updateProgress(100);  // 100%: Content generation complete
+
+    } catch (error) {
+        console.error('Error creating subtopic content:', error);
+        throw error;
+    }
 };

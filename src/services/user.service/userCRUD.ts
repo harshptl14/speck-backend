@@ -1,4 +1,4 @@
-import prisma from '../../../utils/client';
+import { prisma } from '../../../utils/client';
 
 // Function to get a user by email
 async function getUserByEmail(email: string) {
@@ -31,4 +31,35 @@ async function insertUser(user: { email: string, name: string }) {
     }
 }
 
-export { getUserByEmail, insertUser };
+async function deleteUser(userId: number): Promise<void> {
+    try {
+        // Start a transaction to ensure all operations are performed atomically
+        await prisma.$transaction(async (tx) => {
+            // Delete all progress entries related to the user
+            await tx.progress.deleteMany({
+                where: { userId: userId },
+            })
+
+            // Delete all roadmaps created by the user
+            // This will cascade delete related topics, subtopics, content, videoContent, and textContent
+            await tx.roadmap.deleteMany({
+                where: { userId: userId },
+            })
+
+            // Finally, delete the user
+            await tx.user.delete({
+                where: { id: userId },
+            })
+        })
+
+        console.log(`User with ID ${userId} and all related data have been deleted successfully.`)
+    } catch (error) {
+        console.error(`Error deleting user with ID ${userId}:`, error)
+        throw error
+    } finally {
+        await prisma.$disconnect()
+    }
+}
+
+
+export { getUserByEmail, insertUser, deleteUser };

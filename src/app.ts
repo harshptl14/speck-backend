@@ -14,6 +14,7 @@ import roadmaproute from './routes/roadmap.route';
 import { authRouter } from './routes/auth.route'
 import { useGoogleStrategy } from './configs/auth.config';
 import { jwtAuth } from './middlewares/auth.middlewares';
+import userRouter from './routes/user.route';
 
 
 const corsOptions = {
@@ -59,6 +60,7 @@ app.get<{}, MessageResponse>('/', jwtAuth, (req, res) => {
 });
 
 app.use('/speck/v1/roadmap', jwtAuth, roadmaproute);
+app.use('/speck/v1/user', jwtAuth, userRouter);
 
 app.use(middlewares.notFound);
 app.use(middlewares.errorHandler);
