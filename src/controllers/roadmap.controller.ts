@@ -2,8 +2,8 @@ import { Request, Response } from 'express';
 import { createRoadmapService } from '../services/roadmap.service/roadmap.service';
 import { createRoadmapFunction } from '../services/roadmap.service/roadmapLongchain.service';
 import { getRoadmapTitleService } from '../services/roadmap.service/getRoadmapTitle.service';
-import { getRoadmapByIdService, getUserRoadmaps, getTopicsByIdService, getSubTopicByIdService, updateSubtopicCompletionService } from '../services/roadmap.service/userRoadmaps.service';
-import { createRoadmapSchema, createSubtopicContentSchema, getRoadmapByIdSchema, getRoadmapTitleSchema, getRoadmapOutlineSchema, updateSubtopicCompletionSchema } from '../models/roadmapSchemas';
+import { getRoadmapByIdService, getUserRoadmaps, getTopicsByIdService, getSubTopicByIdService, updateSubtopicCompletionService, getRoadmapsInfoByUserIdService } from '../services/roadmap.service/userRoadmaps.service';
+import { createRoadmapSchema, createSubtopicContentSchema, getRoadmapByIdSchema, getRoadmapTitleSchema, getRoadmapOutlineSchema, updateSubtopicCompletionSchema, getRoadmapsInfoByUserIdSchema } from '../models/roadmapSchemas';
 import { createSubtopicContentService } from '../services/roadmap.service/contentScrap.service';
 import { redisClient } from '../../utils/client';
 
@@ -194,12 +194,32 @@ export const getRoadmapOutline = async (req: Request, res: Response) => {
 }
 
 
+export const getRoadmapsInfoByUserId = async (req: Request, res: Response) => {
+    const validationResult = getRoadmapsInfoByUserIdSchema.safeParse(req.params);
+  
+    if (!validationResult.success) {
+        return res.status(400).json({ errors: validationResult.error.errors });
+    }
+      const userId = Number(req.params.id);
+    try {
+        const roadmapsInfo = await getRoadmapsInfoByUserIdService(userId);
+        res.status(200).json({
+            message: 'Roadmaps info retrieved successfully',
+            data: roadmapsInfo,
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: `Failed to get Roadmaps info, ${error}`,
+            error: error,
+        });
+    }
+};
+
 export const updateSubtopicCompletion = async (req: Request, res: Response) => {
     const validationResult = updateSubtopicCompletionSchema.safeParse(req.body);
     if (!validationResult.success) {
         return res.status(400).json({ errors: validationResult.error.errors });
     }
-
     const { topicId, subtopicId, newStatus, roadmapId } = req.body;
     try {
         const user = req?.user as User;

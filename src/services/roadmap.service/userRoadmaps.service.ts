@@ -174,6 +174,78 @@ export const getSubTopicByIdService = async (subtopicId: number) => {
     }
 }
 
+
+export const getRoadmapsInfoByUserIdService = async (userId: number) => {
+    try {
+
+        const totalRoadmapIds = await prisma.roadmap.findMany({
+            where: {
+                userId: userId,
+            },
+            select: {
+                id: true,
+            },
+        });
+
+        const completedRoadmapIds = await prisma.progress.findMany({
+            where: {
+                userId: userId,
+                status: 'COMPLETED',
+            },
+            select: {
+                roadmapId: true,
+            },
+        });
+
+        const favoriteRoadmapIds = await prisma.favorite.findMany({
+            where: {
+                userId: userId,
+            },
+            select: {
+                roadmapId: true,
+            },
+        });
+
+        const userRoadmaps = await prisma.roadmap.findMany({
+            where: {
+                userId: userId
+            },
+            select: {
+                id: true,
+                name: true,
+                progress: {
+                    select: {
+                        status: true
+                    }
+                }
+            }
+        });
+
+        const courses = userRoadmaps.map(roadmap => {
+            const completedTopics = roadmap.progress.filter(p => p.status === 'COMPLETED').length;
+            const totalTopics = roadmap.progress.length;
+            const progress = totalTopics > 0 ? Math.round((completedTopics / totalTopics) * 100) : 0;
+
+            return {
+                id: roadmap.id,
+                name: roadmap.name,
+                progress: progress
+            };
+        });
+
+        return {
+            totalRoadmapIds,
+            completedRoadmapIds,
+            favoriteRoadmapIds,
+            courses
+        };
+
+    } catch (error) {
+        console.error('Error getting roadmapsInfo by userId:', error);
+        throw error;
+    }
+}
+
 export const updateSubtopicCompletionService = async (
     roadmapId: number,
     topicId: number,

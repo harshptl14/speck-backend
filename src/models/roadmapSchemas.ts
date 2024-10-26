@@ -23,6 +23,10 @@ export const getRoadmapOutlineSchema = z.object({
     prompt: z.string().min(1, "Prompt is required"),
 });
 
+export const getRoadmapsInfoByUserIdSchema = z.object({
+    id: z.string().regex(/^\d+$/, "ID must be a number"),
+});
+
 export const updateSubtopicCompletionSchema = z.object({
     roadmapId: z.number().min(1, "Roadmap ID is required"),
     topicId: z.number().min(1, "Topic ID is required"),
