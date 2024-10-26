@@ -177,35 +177,6 @@ export const getSubTopicByIdService = async (subtopicId: number) => {
 
 export const getRoadmapsInfoByUserIdService = async (userId: number) => {
     try {
-
-        const totalRoadmapIds = await prisma.roadmap.findMany({
-            where: {
-                userId: userId,
-            },
-            select: {
-                id: true,
-            },
-        });
-
-        const completedRoadmapIds = await prisma.progress.findMany({
-            where: {
-                userId: userId,
-                status: 'COMPLETED',
-            },
-            select: {
-                roadmapId: true,
-            },
-        });
-
-        const favoriteRoadmapIds = await prisma.favorite.findMany({
-            where: {
-                userId: userId,
-            },
-            select: {
-                roadmapId: true,
-            },
-        });
-
         const userRoadmaps = await prisma.roadmap.findMany({
             where: {
                 userId: userId
@@ -220,16 +191,33 @@ export const getRoadmapsInfoByUserIdService = async (userId: number) => {
                 }
             }
         });
+        const totalRoadmapIds = userRoadmaps.map(roadmap => ({ id: roadmap.id }));
+
+        const completedRoadmapIds = userRoadmaps
+            .filter(roadmap =>
+                roadmap.progress.length > 0 &&
+                roadmap.progress.every(p => p.status === 'COMPLETED')
+            )
+            .map(roadmap => ({ roadmapId: roadmap.id }));
+
+        const favoriteRoadmapIds = await prisma.favorite.findMany({
+            where: {
+                userId: userId,
+            },
+            select: {
+                roadmapId: true,
+            },
+        });
 
         const courses = userRoadmaps.map(roadmap => {
             const completedTopics = roadmap.progress.filter(p => p.status === 'COMPLETED').length;
             const totalTopics = roadmap.progress.length;
             const progress = totalTopics > 0 ? Math.round((completedTopics / totalTopics) * 100) : 0;
-
             return {
                 id: roadmap.id,
                 name: roadmap.name,
-                progress: progress
+                progress: progress,
+                isCompleted: totalTopics > 0 && completedTopics === totalTopics
             };
         });
 
@@ -239,7 +227,6 @@ export const getRoadmapsInfoByUserIdService = async (userId: number) => {
             favoriteRoadmapIds,
             courses
         };
-
     } catch (error) {
         console.error('Error getting roadmapsInfo by userId:', error);
         throw error;
