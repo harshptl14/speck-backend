@@ -2,8 +2,8 @@ import { Request, Response } from 'express';
 import { createRoadmapService } from '../services/roadmap.service/roadmap.service';
 import { createRoadmapFunction } from '../services/roadmap.service/roadmapLongchain.service';
 import { getRoadmapTitleService } from '../services/roadmap.service/getRoadmapTitle.service';
-import { getRoadmapByIdService, getUserRoadmaps, getTopicsByIdService, getSubTopicByIdService } from '../services/roadmap.service/userRoadmaps.service';
-import { createRoadmapSchema, createSubtopicContentSchema, getRoadmapByIdSchema, getRoadmapTitleSchema, getRoadmapOutlineSchema } from '../models/roadmapSchemas';
+import { getRoadmapByIdService, getUserRoadmaps, getTopicsByIdService, getSubTopicByIdService, updateSubtopicCompletionService } from '../services/roadmap.service/userRoadmaps.service';
+import { createRoadmapSchema, createSubtopicContentSchema, getRoadmapByIdSchema, getRoadmapTitleSchema, getRoadmapOutlineSchema, updateSubtopicCompletionSchema } from '../models/roadmapSchemas';
 import { createSubtopicContentService } from '../services/roadmap.service/contentScrap.service';
 import { redisClient } from '../../utils/client';
 
@@ -192,3 +192,27 @@ export const getRoadmapOutline = async (req: Request, res: Response) => {
         });
     }
 }
+
+
+export const updateSubtopicCompletion = async (req: Request, res: Response) => {
+    const validationResult = updateSubtopicCompletionSchema.safeParse(req.body);
+    if (!validationResult.success) {
+        return res.status(400).json({ errors: validationResult.error.errors });
+    }
+
+    const { topicId, subtopicId, newStatus, roadmapId } = req.body;
+    try {
+        const user = req?.user as User;
+        const response = await updateSubtopicCompletionService(roadmapId, topicId, subtopicId, newStatus, user.id);
+        res.status(200).json({
+            message: 'Subtopic completion status updated successfully',
+            data: response,
+        });
+    } catch (error) {
+        console.error('Error updating subtopic completion:', error);
+        res.status(500).json({
+            message: 'Failed to update subtopic completion',
+            error: error,
+        });
+    }
+};

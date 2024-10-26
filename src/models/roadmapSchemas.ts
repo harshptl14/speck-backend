@@ -22,3 +22,10 @@ export const getRoadmapTitleSchema = z.object({
 export const getRoadmapOutlineSchema = z.object({
     prompt: z.string().min(1, "Prompt is required"),
 });
+
+export const updateSubtopicCompletionSchema = z.object({
+    roadmapId: z.number().min(1, "Roadmap ID is required"),
+    topicId: z.number().min(1, "Topic ID is required"),
+    subtopicId: z.number().min(1, "Subtopic ID is required"),
+    newStatus: z.string().min(1, "New status is required"),
+});

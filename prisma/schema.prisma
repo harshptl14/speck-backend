@@ -136,8 +136,27 @@ model Progress {
   createdAt  DateTime       @default(now())
   updatedAt  DateTime       @updatedAt
 
-  @@unique([userId, roadmapId, topicId, subtopicId])
+  @@unique([userId, roadmapId, topicId, subtopicId]) // Subtopic-level progress
 }
+
+// model Progress {
+//   id         Int            @id @default(autoincrement())
+//   userId     Int
+//   user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   roadmapId  Int
+//   roadmap    Roadmap        @relation("RoadmapProgress", fields: [roadmapId], references: [id], onDelete: Cascade)
+//   topicId    Int?
+//   topic      Topic?         @relation("TopicProgress", fields: [topicId], references: [id], onDelete: SetNull)
+//   subtopicId Int?
+//   subtopic   Subtopic?      @relation("SubtopicProgress", fields: [subtopicId], references: [id], onDelete: SetNull)
+//   status     ProgressStatus
+//   createdAt  DateTime       @default(now())
+//   updatedAt  DateTime       @updatedAt
+
+//   @@unique([userId, roadmapId], name: "user_roadmap_unique") // Roadmap-level progress
+//   @@unique([userId, roadmapId, topicId], name: "user_roadmap_topic_unique") // Topic-level progress
+//   @@unique([userId, roadmapId, topicId, subtopicId], name: "user_roadmap_topic_subtopic_unique") // Subtopic-level progress
+// }
 
 enum ContentType {
   YOUTUBE
