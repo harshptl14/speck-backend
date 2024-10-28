@@ -1,19 +1,28 @@
 import { NextFunction, Request, Response } from 'express';
+import { ApiError } from '../../utils/ApiError';
+import { ApiErrorType, ErrorResponse } from '../interfaces/Error.interface';
 
-import ErrorResponse from '../interfaces/ErrorResponse';
+export const notFound = (req: Request, res: Response, next: NextFunction) => {
+  next(ApiError(404, `🔍 - Not Found - ${req.originalUrl}`));
+};
 
-export function notFound(req: Request, res: Response, next: NextFunction) {
-  res.status(404);
-  const error = new Error(`🔍 - Not Found - ${req.originalUrl}`);
-  next(error);
-}
+export const errorHandler = (
+  err: Error | ApiErrorType,
+  req: Request,
+  res: Response<ErrorResponse>,
+  next: NextFunction
+): void => {
+  const statusCode = 'statusCode' in err ? err.statusCode : (res.statusCode !== 200 ? res.statusCode : 500);
+  const status = 'status' in err ? err.status : (statusCode >= 400 && statusCode < 500 ? 'fail' : 'error');
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function errorHandler(err: Error, req: Request, res: Response<ErrorResponse>, next: NextFunction) {
-  const statusCode = res.statusCode !== 200 ? res.statusCode : 500;
-  res.status(statusCode);
-  res.json({
+  res.status(statusCode).json({
+    success: false,
+    status,
     message: err.message,
-    stack: process.env.NODE_ENV === 'production' ? '🥞' : err.stack,
+    ...(process.env.NODE_ENV === 'development' ? {
+      stack: err.stack
+    } : {
+      stack: process.env.NODE_ENV === 'production' ? '🥞' : err.stack
+    })
   });
-}
+};

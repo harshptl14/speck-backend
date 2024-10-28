@@ -33,3 +33,7 @@ export const updateSubtopicCompletionSchema = z.object({
     subtopicId: z.number().min(1, "Subtopic ID is required"),
     newStatus: z.string().min(1, "New status is required"),
 });
+
+export const resetRoadmapProgressSchema = z.object({
+    roadmapId: z.string(),
+});

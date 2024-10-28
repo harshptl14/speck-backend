@@ -1,8 +1,7 @@
 import express, { Router, Request, Response, NextFunction } from 'express';
 import MessageResponse from '../interfaces/MessageResponse';
-import { createRoadmap, getMyRoadmaps, getRoadmapTitle, getRoadmapById, getTopicsById, getSubTopicById, createSubtopicContent, getSubtopicGenerationProgress, updateSubtopicCompletion, getRoadmapsInfoByUserId } from '../controllers/roadmap.controller';
-
-
+import { createRoadmap, getMyRoadmaps, getRoadmapTitle, getRoadmapById, getTopicsById, getSubTopicById, createSubtopicContent, getSubtopicGenerationProgress, updateSubtopicCompletion, getRoadmapsInfoByUserId, resetRoadmapProgress } from '../controllers/roadmap.controller';
+import { createFavorite, removeFavorite, getUserFavorites } from '../controllers/favourite.controller';
 const router = express.Router();
 
 router.get<{}, MessageResponse>('/myroadmaps', getMyRoadmaps);
@@ -16,5 +15,13 @@ router.get('/getRoadmapsInfoByUserId/:id', getRoadmapsInfoByUserId)
 router.post('/generateSubtopicContent', createSubtopicContent);
 router.get('/subtopicGenerationProgress/:jobId', getSubtopicGenerationProgress);
 router.post('/updateSubtopicCompletion', updateSubtopicCompletion);
+
+
+router.post('/createFavorite/:roadmapId', createFavorite);
+router.delete('/removeFavorite/:roadmapId', removeFavorite);
+router.get('/userFavorites', getUserFavorites);
+
+router.post('/resetRoadmapProgress', resetRoadmapProgress);
+
 
 export default router;

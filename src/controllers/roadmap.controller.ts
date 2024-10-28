@@ -2,8 +2,8 @@ import { Request, Response } from 'express';
 import { createRoadmapService } from '../services/roadmap.service/roadmap.service';
 import { createRoadmapFunction } from '../services/roadmap.service/roadmapLongchain.service';
 import { getRoadmapTitleService } from '../services/roadmap.service/getRoadmapTitle.service';
-import { getRoadmapByIdService, getUserRoadmaps, getTopicsByIdService, getSubTopicByIdService, updateSubtopicCompletionService, getRoadmapsInfoByUserIdService } from '../services/roadmap.service/userRoadmaps.service';
-import { createRoadmapSchema, createSubtopicContentSchema, getRoadmapByIdSchema, getRoadmapTitleSchema, getRoadmapOutlineSchema, updateSubtopicCompletionSchema, getRoadmapsInfoByUserIdSchema } from '../models/roadmapSchemas';
+import { getRoadmapByIdService, getUserRoadmaps, getTopicsByIdService, getSubTopicByIdService, updateSubtopicCompletionService, getRoadmapsInfoByUserIdService, resetRoadmapProgressService } from '../services/roadmap.service/userRoadmaps.service';
+import { createRoadmapSchema, createSubtopicContentSchema, getRoadmapByIdSchema, getRoadmapTitleSchema, getRoadmapOutlineSchema, updateSubtopicCompletionSchema, getRoadmapsInfoByUserIdSchema, resetRoadmapProgressSchema } from '../models/roadmapSchemas';
 import { createSubtopicContentService } from '../services/roadmap.service/contentScrap.service';
 import { redisClient } from '../../utils/client';
 
@@ -239,6 +239,37 @@ export const updateSubtopicCompletion = async (req: Request, res: Response) => {
         res.status(500).json({
             message: 'Failed to update subtopic completion',
             error: error,
+        });
+    }
+};
+
+export const resetRoadmapProgress = async (req: Request, res: Response) => {
+    // Validate the request body
+    const validationResult = resetRoadmapProgressSchema.safeParse(req.body);
+    if (!validationResult.success) {
+        return res.status(400).json({ errors: validationResult.error.errors });
+    }
+
+    // const { roadmapId } = req.body;
+
+    const { roadmapId } = validationResult.data;
+
+    try {
+        console.log("roadmap id in backend", roadmapId);
+
+        const user = req.user as User; // Assuming you have user information in the request
+
+        // Call the service to reset the roadmap progress
+        await resetRoadmapProgressService(roadmapId, user.id);
+
+        res.status(200).json({
+            message: 'Roadmap progress reset successfully',
+        });
+    } catch (error) {
+        console.error('Error resetting roadmap progress:', error);
+        res.status(500).json({
+            message: 'Failed to reset roadmap progress',
+            error: error instanceof Error ? error.message : 'Unknown error',
         });
     }
 };

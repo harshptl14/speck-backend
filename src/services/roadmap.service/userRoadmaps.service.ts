@@ -374,3 +374,29 @@ export const updateSubtopicCompletionService = async (
         throw error;
     }
 };
+
+
+export const resetRoadmapProgressService = async (
+    roadmapId: string,
+    userId: number
+) => {
+    try {
+        await prisma.$transaction(async (tx) => {
+            // Reset all subtopics progress
+            await tx.progress.updateMany({
+                where: {
+                    userId,
+                    roadmapId: Number(roadmapId),
+                },
+                data: {
+                    status: ProgressStatus.NOT_STARTED,
+                },
+            });
+        });
+
+        console.log(`Progress reset for roadmap ${roadmapId} and user ${userId}`);
+    } catch (error) {
+        console.error('Error resetting roadmap progress:', error);
+        throw error;
+    }
+};
