@@ -1,10 +1,9 @@
 import { PrismaClient } from '@prisma/client'
-import Redis from "ioredis";
-import { createClient } from 'redis';
+import { createClient, RedisClientType } from 'redis';
 
 let prisma = new PrismaClient()
 
-const redisClient = createClient({
+const redisClient: RedisClientType = createClient({
     url: process.env.REDIS_URL || 'redis://redis:6379'
 });
 
