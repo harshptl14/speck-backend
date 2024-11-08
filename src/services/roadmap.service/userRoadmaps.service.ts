@@ -38,6 +38,9 @@ export const getRoadmapByIdService = async (roadmapId: number) => {
             include: {
                 subtopics: true,
             },
+            orderBy: {
+                id: 'asc',
+            },
         });
 
         let subtopicCount = 0;
@@ -95,8 +98,11 @@ export const getTopicsByIdService = async (roadmapId: number) => {
                         id: true,
                         progress: true,
                     }
-                }
-            }
+                },
+            },
+            orderBy: {
+                id: 'asc',
+            },
         });
 
         return {
