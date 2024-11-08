@@ -189,6 +189,9 @@ export const populateFirstRoadmapTopic = async (roadmapID: number) => {
         },
         include: {
             topics: {
+                orderBy: {
+                    order: 'asc'
+                },
                 include: {
                     subtopics: true
                 }
