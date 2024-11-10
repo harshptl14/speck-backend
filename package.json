@@ -1,7 +1,7 @@
 {
   "name": "express-api-starter-ts",
   "version": "1.2.0",
-  "description": " A basic starter for an express.js API with Typescript",
+  "description": "A basic starter for an express.js API with Typescript",
   "main": "src/index.ts",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
@@ -12,7 +12,13 @@
     "lint": "eslint --fix src test",
     "test": "jest",
     "typecheck": "tsc --noEmit",
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "ts-node prisma/seed.ts",
+    "prisma:generate": "npx prisma generate",
+    "prisma:migrate": "npx prisma migrate deploy",
+    "prisma:seed": "pnpm run seed",
+    "deploy:build": "pnpm run build",
+    "deploy:pre-deploy": "pnpm run prisma:generate && pnpm run prisma:migrate && pnpm run prisma:seed",
+    "deploy:start": "pnpm run start:dist"
   },
   "keywords": [],
   "author": "CJ R. <cj@null.computer> (https://w3cj.now.sh)",
@@ -71,6 +77,13 @@
     "nodemon": "^3.1.4",
     "supertest": "^6.3.4",
     "ts-jest": "^29.1.5",
+    "typescript": "^5.5.3"
+  },
+  "engines": {
+    "node": ">=14.17.0",
+    "bun": ">=1.1.0"
+  },
+  "resolutions": {
     "typescript": "^5.5.3"
   }
 }
