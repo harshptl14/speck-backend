@@ -38,12 +38,12 @@ authRouter.get(
 
             res.cookie('jwtToken', token, {
                 httpOnly: true,
-                secure: process.env.ENVIRONMENT === 'production',
+                secure: true,
 
-                sameSite: process.env.ENVIRONMENT === 'production' ? 'lax' : 'lax',
+                sameSite: "none",
                 maxAge: 2 * 60 * 60 * 1000, // 2 hours
                 path: '/',
-                domain: process.env.ENVIRONMENT === 'production' ? "onrender.com" : undefined
+                // domain: process.env.ENVIRONMENT === 'production' ? "onrender.com" : undefined
             });
 
             console.log("token", token);
