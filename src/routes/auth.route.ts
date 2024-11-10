@@ -20,7 +20,21 @@ authRouter.get(
             process.env.JWT_SECRET || '',
             { expiresIn: "2h" },
         );
-        res.cookie('jwtToken', token);
+        console.log("setting cookie");
+
+        res.cookie('jwtToken', token,
+            {
+                path: '/',
+                // "domain" - The cookie belongs to the 'example.com' domain
+                domain: process.env.REDIRECT_URL_FRONTEND || 'localhost',
+                // "secure" - The cookie will be sent over HTTPS only
+                secure: true,
+                // "HttpOnly" - The cookie cannot be accessed by client-side scripts
+                httpOnly: true
+            }
+        );
+        console.log("token", token);
+
         res.redirect(process.env.REDIRECT_URL_FRONTEND || '/');
     }
 );

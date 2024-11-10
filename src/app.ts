@@ -21,7 +21,7 @@ const corsOptions = {
   origin: process.env.REDIRECT_URL_FRONTEND || 'http://localhost:3000', // Make sure this matches your frontend URL exactly
   credentials: true, // This is crucial for allowing cookies to be sent
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Set-Cookie'],
 };
 
 
@@ -38,7 +38,7 @@ app.use(session({
   cookie: {
     secure: process.env.ENVIRONMENT === 'production', // true in production
     httpOnly: true,
-    sameSite: 'lax', // or 'strict', depending on your needs
+    sameSite: 'none', // or 'strict', depending on your needs
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
 }));
