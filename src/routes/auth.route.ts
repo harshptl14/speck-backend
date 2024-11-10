@@ -21,6 +21,9 @@ authRouter.get(
             { expiresIn: "2h" },
         );
         res.cookie('jwtToken', token, {
+            httpOnly: true,
+            // secure: process.env.NODE_ENV === 'production',
+            sameSite: 'none',
             path: '/',
         });
         res.redirect(process.env.REDIRECT_URL_FRONTEND || '/');
