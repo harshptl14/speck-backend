@@ -16,6 +16,7 @@ RUN npx prisma generate
 COPY . .
 
 EXPOSE 4000
+EXPOSE 5000
 EXPOSE 5555
 
 CMD ["pnpm", "run", "dev", "--inspect"]
