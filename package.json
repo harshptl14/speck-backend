@@ -12,8 +12,7 @@
     "lint": "eslint --fix src test",
     "test": "jest",
     "typecheck": "tsc --noEmit",
-    "seed": "node dist/prisma/seed.js",
-    "build:seed": "tsc prisma/seed.ts --outDir dist"
+    "seed": "ts-node prisma/seed.ts"
   },
   "keywords": [],
   "author": "CJ R. <cj@null.computer> (https://w3cj.now.sh)",
@@ -48,7 +47,8 @@
     "prisma": "^5.16.2",
     "redis": "^4.7.0",
     "xml2js": "^0.6.2",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "ts-node": "^10.9.2"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
@@ -71,7 +71,6 @@
     "nodemon": "^3.1.4",
     "supertest": "^6.3.4",
     "ts-jest": "^29.1.5",
-    "ts-node": "^10.9.2",
     "typescript": "^5.5.3"
   }
 }
