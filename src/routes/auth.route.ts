@@ -23,8 +23,10 @@ authRouter.get(
         res.cookie('jwtToken', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'none',
+            // sameSite: 'none',   // 'none' is required for cross-site cookies
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',  // Enable cross-site cookies in production
             path: '/',
+            domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : 'localhost',  // Set domain dynamically
         });
         res.redirect(process.env.REDIRECT_URL_FRONTEND || '/');
     }
