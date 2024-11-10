@@ -13,30 +13,46 @@ authRouter.get(
     '/google/callback',
     passport.authenticate('google', { failureRedirect: '/login' }),
     (req: Request, res: Response) => {
-        console.log(req.user);
+        try {
+            console.log(req.user);
 
-        const token = jwt.sign(
-            { user: req.user },
-            process.env.JWT_SECRET || '',
-            { expiresIn: "2h" },
-        );
-        console.log("setting cookie");
+            const token = jwt.sign(
+                { user: req.user },
+                process.env.JWT_SECRET || '',
+                { expiresIn: "2h" },
+            );
+            console.log("setting cookie");
 
-        res.cookie('jwtToken', token,
-            {
-                path: '/',
-                // "domain" - The cookie belongs to the 'example.com' domain
-                domain: process.env.REDIRECT_URL_FRONTEND || 'localhost',
-                // "secure" - The cookie will be sent over HTTPS only
-                secure: true,
-                // "HttpOnly" - The cookie cannot be accessed by client-side scripts
+            // res.cookie('jwtToken', token,
+            //     {
+            //         path: '/',
+            //         // "domain" - The cookie belongs to the 'example.com' domain
+            //         domain: process.env.REDIRECT_URL_FRONTEND || 'localhost',
+            //         // "secure" - The cookie will be sent over HTTPS only
+            //         secure: true,
+            //         // "HttpOnly" - The cookie cannot be accessed by client-side scripts
+            //         httpOnly: true,
+            //         sameSite: 'none'
+            //     }
+            // );
+
+            res.cookie('jwtToken', token, {
                 httpOnly: true,
-                sameSite: 'none'
-            }
-        );
-        console.log("token", token);
+                secure: process.env.ENVIRONMENT === 'production',
 
-        res.redirect(process.env.REDIRECT_URL_FRONTEND || '/');
+                sameSite: process.env.ENVIRONMENT === 'production' ? 'lax' : 'lax',
+                maxAge: 2 * 60 * 60 * 1000, // 2 hours
+                path: '/',
+                domain: process.env.ENVIRONMENT === 'production' ? "onrender.com" : undefined
+            });
+
+            console.log("token", token);
+
+            res.redirect(process.env.REDIRECT_URL_FRONTEND || '/');
+        } catch (error) {
+            console.log('Error in Google callback:', error);
+            res.redirect('/auth?error=authentication_failed');
+        }
     }
 );
 

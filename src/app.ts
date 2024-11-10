@@ -21,7 +21,8 @@ const corsOptions = {
   origin: process.env.REDIRECT_URL_FRONTEND || 'http://localhost:3000', // Make sure this matches your frontend URL exactly
   credentials: true, // This is crucial for allowing cookies to be sent
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Set-Cookie'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Set-Cookie'],
   secure: process.env.ENVIRONMENT === 'production'
 };
 
