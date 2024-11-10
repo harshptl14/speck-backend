@@ -22,6 +22,7 @@ const corsOptions = {
   credentials: true, // This is crucial for allowing cookies to be sent
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Set-Cookie'],
+  secure: process.env.ENVIRONMENT === 'production'
 };
 
 
