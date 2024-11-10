@@ -17,7 +17,6 @@
     "prisma:migrate": "npx prisma migrate deploy",
     "prisma:seed": "pnpm run seed",
     "deploy:build": "pnpm run build",
-    "deploy:pre-deploy": "pnpm run prisma:generate && pnpm run prisma:migrate && pnpm run prisma:seed",
     "deploy:start": "pnpm run start:dist"
   },
   "keywords": [],
