@@ -12,7 +12,8 @@
     "lint": "eslint --fix src test",
     "test": "jest",
     "typecheck": "tsc --noEmit",
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "node dist/prisma/seed.js",
+    "build:seed": "tsc prisma/seed.ts --outDir dist"
   },
   "keywords": [],
   "author": "CJ R. <cj@null.computer> (https://w3cj.now.sh)",
