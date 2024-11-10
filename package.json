@@ -1,33 +1,33 @@
 {
   "name": "express-api-starter-ts",
   "version": "1.2.0",
-  "description": " A basic starter for an express.js API with Typescript",
-  "main": "src/index.ts",
+  "description": "A basic starter for an express.js API with Typescript",
+  "main": "dist/index.js",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "start": "ts-node src/index.ts",
-    "dev": "nodemon src/index.ts",
-    "build": "tsc",
-    "start:dist": "node dist/src/index.js",
+    "build": "prisma generate && tsc",
+    "start": "node dist/index.js",
+    "dev": "nodemon",
     "lint": "eslint --fix src test",
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "seed": "ts-node prisma/seed.ts"
   },
-  "keywords": [],
-  "author": "CJ R. <cj@null.computer> (https://w3cj.now.sh)",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/w3cj/express-api-starter.git"
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   },
-  "license": "MIT",
   "dependencies": {
     "@langchain/core": "^0.2.15",
     "@langchain/groq": "^0.0.13",
     "@langchain/openai": "^0.2.2",
     "@prisma/client": "^5.16.2",
-    "@types/cheerio": "^0.22.35",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
     "@types/express-session": "^1.18.0",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^20.14.9",
+    "@types/passport": "^1.0.16",
+    "@types/passport-google-oauth20": "^2.0.16",
     "axios": "^1.7.2",
     "cheerio": "^1.0.0",
     "cors": "^2.8.5",
@@ -46,20 +46,15 @@
     "passport-jwt": "^4.0.1",
     "prisma": "^5.16.2",
     "redis": "^4.7.0",
-    "xml2js": "^0.6.2",
-    "zod": "^3.23.8",
     "ts-node": "^10.9.2",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.3",
+    "xml2js": "^0.6.2",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/cors": "^2.8.17",
-    "@types/express": "^4.17.21",
+    "@types/cheerio": "^0.22.35",
     "@types/jest": "^29.5.12",
     "@types/jsonwebtoken": "^9.0.6",
-    "@types/morgan": "^1.9.9",
-    "@types/node": "^20.14.9",
-    "@types/passport": "^1.0.16",
-    "@types/passport-google-oauth20": "^2.0.16",
     "@types/supertest": "^6.0.2",
     "@types/xml2js": "^0.4.14",
     "@typescript-eslint/eslint-plugin": "^7.15.0",
@@ -72,5 +67,8 @@
     "nodemon": "^3.1.4",
     "supertest": "^6.3.4",
     "ts-jest": "^29.1.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
