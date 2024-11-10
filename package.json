@@ -2,7 +2,7 @@
   "name": "express-api-starter-ts",
   "version": "1.2.0",
   "description": "A basic starter for an express.js API with Typescript",
-  "main": "dist/index.js",
+  "main": "dist/src/index.js",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "build": "prisma generate && tsc",

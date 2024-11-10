@@ -20,14 +20,7 @@ authRouter.get(
             process.env.JWT_SECRET || '',
             { expiresIn: "2h" },
         );
-        res.cookie('jwtToken', token, {
-            httpOnly: true,
-            secure: process.env.ENVIRONMENT === 'production',
-            // sameSite: 'none',   // 'none' is required for cross-site cookies
-            sameSite: process.env.ENVIRONMENT === 'production' ? 'none' : 'lax',  // Enable cross-site cookies in production
-            path: '/',
-            domain: process.env.ENVIRONMENT === 'production' ? '.onrender.com' : 'localhost',  // Set domain dynamically
-        });
+        res.cookie('jwtToken', token);
         res.redirect(process.env.REDIRECT_URL_FRONTEND || '/');
     }
 );
