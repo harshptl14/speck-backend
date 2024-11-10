@@ -43,7 +43,7 @@ authRouter.get(
                 sameSite: "none",
                 maxAge: 2 * 60 * 60 * 1000, // 2 hours
                 path: '/',
-                // domain: process.env.ENVIRONMENT === 'production' ? "onrender.com" : undefined
+                domain: process.env.ENVIRONMENT === 'production' ? process.env.REDIRECT_URL_FRONTEND : undefined
             });
 
             console.log("token", token);

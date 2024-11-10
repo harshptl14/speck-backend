@@ -11,12 +11,15 @@ export const jwtAuth = (req: Request, res: Response, next: NextFunction) => {
     }
     const jwtToken = token.substring(7);
     try {
+        console.log("checking token");
         const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET || '') as { user: any };
         req.user = decoded.user;
         console.log("backend:", decoded);
         next();
     } catch (err) {
         // res.clearCookie('jwtToken');
+        console.log("error in jwtAuth", err);
+
         res.setHeader('Set-Cookie', 'jwtToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly');
         console.log(err);
         // res.redirect('/auth');
