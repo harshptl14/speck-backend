@@ -108,7 +108,7 @@ authRouter.get('/google/success', (req: Request, res: Response) => {
             sameSite: 'none',
             maxAge: 24 * 60 * 60 * 1000, // 24 hours
             path: '/',
-            domain: process.env.REDIRECT_URL_FRONTEND,
+            domain: 'speck-frontend-production.up.railway.app',
         });
 
         res.redirect(process.env.REDIRECT_URL_FRONTEND || '/');
