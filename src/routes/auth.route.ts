@@ -28,7 +28,7 @@ authRouter.get(
                 sameSite: 'none',        // Allows cross-site cookie
                 maxAge: 24 * 60 * 60 * 1000, // 24 hours
                 path: '/',               // Root path
-                domain: '.speck.ing',    // Parent domain for subdomain access
+                domain: process.env.MAIN_DOMAIN,    // Parent domain for subdomain access
             });
 
             res.redirect(process.env.REDIRECT_URL_FRONTEND || '/');
@@ -46,7 +46,7 @@ authRouter.get('/logout', function (req: Request, res: Response, next: NextFunct
         if (err) { return next(err); }
         res.clearCookie('jwtToken', { 
             path: '/', 
-            domain: '.speck.ing',
+            domain: process.env.MAIN_DOMAIN,
             httpOnly: true,
             secure: true,
             sameSite: 'none',
