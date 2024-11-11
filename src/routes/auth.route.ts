@@ -22,7 +22,7 @@ authRouter.get(
     '/google/callback',
     passport.authenticate('google', {
         failureRedirect: '/auth',
-        successRedirect: '/auth/google/success',
+        successRedirect: '/google/success',
     }),
     // (req: Request, res: Response) => {
     //     const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
