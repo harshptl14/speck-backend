@@ -24,7 +24,6 @@ authRouter.get(
 
             // Set cookie with correct domain
             res.cookie('jwtToken', token, {
-                httpOnly: true,          // Prevents JavaScript access
                 secure: true,            // Ensures cookie is sent over HTTPS
                 sameSite: 'none',        // Allows cross-site cookie
                 maxAge: 24 * 60 * 60 * 1000, // 24 hours
