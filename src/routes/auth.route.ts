@@ -32,10 +32,9 @@ authRouter.get(
                 domain: '.speck.ing',    // Parent domain for subdomain access
             });
 
-            console.log("Token set:", token);
+            res.redirect(process.env.REDIRECT_URL_FRONTEND || '/');
 
-            // Redirect to frontend callback
-            res.redirect('https://app.speck.ing/auth/callback');
+            
         } catch (error) {
             console.log('Error in Google callback:', error);
             res.redirect('/auth?error=authentication_failed');
@@ -55,7 +54,7 @@ authRouter.get('/logout', function (req: Request, res: Response, next: NextFunct
         });
         req.session.destroy(function (err) {
             if (err) { return next(err); }
-            res.redirect('https://app.speck.ing');
+            res.redirect(process.env.REDIRECT_URL_FRONTEND || '/');
         });
     });
 });
