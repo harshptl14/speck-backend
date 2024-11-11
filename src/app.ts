@@ -21,12 +21,11 @@ import { requireHTTPS } from './middlewares/middlewares';
 const corsOptions = {
   origin: process.env.REDIRECT_URL_FRONTEND,
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
   exposedHeaders: ['Set-Cookie'],
-  secure: true, // Always true in production
-  maxAge: 24 * 60 * 60, // Pre-flight request caching
-  optionsSuccessStatus: 200
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 };
 
 
@@ -36,20 +35,21 @@ app.use(requireHTTPS);
 // app.use(morgan('dev'));
 // app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(express.json());
-
+app.set('trust proxy', 1);
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'secret',
+  secret: process.env.SESSION_SECRET || "your-secret-key",
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: true, // Always use secure cookies in production
+    secure: true, // Railway uses HTTPS
     httpOnly: true,
-    sameSite: 'none', // Adjust based on your domain setup
-    maxAge: 24 * 60 * 60 * 1000,
-    domain: process.env.COOKIE_DOMAIN // Add your domain
+    sameSite: 'none', // Important for cross-origin requests
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    path: '/',
+    // Don't set domain explicitly when using Railway
+    // domain: undefined // Let the browser handle the domain
   },
-  name: 'sessionId', // Change default connect.sid name
-  proxy: true // Trust the reverse proxy
+  proxy: true
 }));
 
 app.use(passport.initialize());

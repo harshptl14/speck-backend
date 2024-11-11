@@ -42,11 +42,16 @@ authRouter.get(
             res.cookie('jwtToken', token, {
                 httpOnly: true,
                 secure: true,
-
-                sameSite: "none",
-                maxAge: 2 * 60 * 60 * 1000, // 2 hours
+                sameSite: 'none',
+                maxAge: 24 * 60 * 60 * 1000,
                 path: '/',
-                domain: process.env.NODE_ENV === 'production' ? process.env.REDIRECT_URL_FRONTEND : undefined
+                // httpOnly: true,
+                // secure: true,
+
+                // sameSite: "none",
+                // maxAge: 2 * 60 * 60 * 1000, // 2 hours
+                // path: '/',
+                // domain: process.env.NODE_ENV === 'production' ? process.env.REDIRECT_URL_FRONTEND : undefined
             });
 
             console.log("token", token);
