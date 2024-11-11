@@ -70,10 +70,10 @@ authRouter.get(
             res.cookie('jwtToken', token, {
                 httpOnly: true,
                 secure: true,
-                sameSite: 'lax',
+                sameSite: 'none',
                 maxAge: 24 * 60 * 60 * 1000, // 24 hours
                 path: '/',
-                // domain: frontendDomain === 'localhost' ? undefined : `.${frontendDomain}`
+                domain: process.env.REDIRECT_URL_FRONTEND,
             });
 
             res.cookie("test", "test");
