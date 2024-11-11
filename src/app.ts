@@ -18,11 +18,21 @@ import userRouter from './routes/user.route';
 import { requireHTTPS } from './middlewares/middlewares';
 
 
+// const corsOptions = {
+//   origin: process.env.REDIRECT_URL_FRONTEND,
+//   credentials: true,
+//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+//   allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+//   exposedHeaders: ['Set-Cookie'],
+//   preflightContinue: false,
+//   optionsSuccessStatus: 204
+// };
+
 const corsOptions = {
-  origin: process.env.REDIRECT_URL_FRONTEND,
-  credentials: true,
+  origin: process.env.REDIRECT_URL_FRONTEND, // Exact frontend URL
+  credentials: true,               // Allow cookies to be sent
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   exposedHeaders: ['Set-Cookie'],
   preflightContinue: false,
   optionsSuccessStatus: 204

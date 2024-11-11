@@ -13,50 +13,29 @@ authRouter.get(
     '/google/callback',
     passport.authenticate('google', { failureRedirect: '/auth' }),
     (req: Request, res: Response) => {
-        const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
-        console.log("Requested URL:", fullUrl);
-
         try {
-            console.log(req.user);
-
+            // Generate JWT
             const token = jwt.sign(
                 { user: req.user },
                 process.env.JWT_SECRET || '',
                 { expiresIn: "2h" },
             );
-            console.log("setting cookie");
+            console.log("Setting cookie");
 
-            // res.cookie('jwtToken', token,
-            //     {
-            //         path: '/',
-            //         // "domain" - The cookie belongs to the 'example.com' domain
-            //         domain: process.env.REDIRECT_URL_FRONTEND || 'localhost',
-            //         // "secure" - The cookie will be sent over HTTPS only
-            //         secure: true,
-            //         // "HttpOnly" - The cookie cannot be accessed by client-side scripts
-            //         httpOnly: true,
-            //         sameSite: 'none'
-            //     }
-            // );
-
+            // Set cookie with correct domain
             res.cookie('jwtToken', token, {
-                httpOnly: true,
-                secure: true,
-                sameSite: 'none',
-                maxAge: 24 * 60 * 60 * 1000,
-                path: '/',
-                // httpOnly: true,
-                // secure: true,
-
-                // sameSite: "none",
-                // maxAge: 2 * 60 * 60 * 1000, // 2 hours
-                // path: '/',
-                // domain: process.env.NODE_ENV === 'production' ? process.env.REDIRECT_URL_FRONTEND : undefined
+                httpOnly: true,          // Prevents JavaScript access
+                secure: true,            // Ensures cookie is sent over HTTPS
+                sameSite: 'none',        // Allows cross-site cookie
+                maxAge: 24 * 60 * 60 * 1000, // 24 hours
+                path: '/',               // Root path
+                domain: '.speck.ing',    // Parent domain for subdomain access
             });
 
-            console.log("token", token);
+            console.log("Token set:", token);
 
-            res.redirect(process.env.REDIRECT_URL_FRONTEND || '/');
+            // Redirect to frontend callback
+            res.redirect('https://app.speck.ing/auth/callback');
         } catch (error) {
             console.log('Error in Google callback:', error);
             res.redirect('/auth?error=authentication_failed');
@@ -67,10 +46,16 @@ authRouter.get(
 authRouter.get('/logout', function (req: Request, res: Response, next: NextFunction) {
     req.logout(function (err) {
         if (err) { return next(err); }
-        res.clearCookie('jwtToken');
+        res.clearCookie('jwtToken', { 
+            path: '/', 
+            domain: '.speck.ing',
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none',
+        });
         req.session.destroy(function (err) {
             if (err) { return next(err); }
-            res.redirect(process.env.REDIRECT_URL_FRONTEND || '/');
+            res.redirect('https://app.speck.ing');
         });
     });
 });
