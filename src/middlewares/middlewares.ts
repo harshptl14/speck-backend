@@ -26,3 +26,13 @@ export const errorHandler = (
     })
   });
 };
+
+
+export const requireHTTPS = (req, res, next) => {
+  // The 'x-forwarded-proto' header is typically set by load balancers/reverse proxies
+  if (!req.secure && req.get('x-forwarded-proto') !== 'https' && process.env.NODE_ENV === 'production') {
+    // 307 Temporary Redirect
+    return res.redirect(307, `https://${req.get('host')}${req.url}`);
+  }
+  next();
+};

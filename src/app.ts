@@ -15,6 +15,7 @@ import { authRouter } from './routes/auth.route'
 import { useGoogleStrategy } from './configs/auth.config';
 import { jwtAuth } from './middlewares/auth.middlewares';
 import userRouter from './routes/user.route';
+import { requireHTTPS } from './middlewares/middlewares';
 
 
 const corsOptions = {
@@ -31,6 +32,7 @@ const corsOptions = {
 
 const app = express();
 app.use(cors(corsOptions));
+app.use(requireHTTPS);
 // app.use(morgan('dev'));
 // app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(express.json());
