@@ -1,6 +1,6 @@
 // Library imports
-import morgan from 'morgan';
-import helmet from 'helmet';
+// import morgan from 'morgan';
+// import helmet from 'helmet';
 import express from 'express';
 import cors from 'cors';
 import passport from 'passport';
@@ -18,31 +18,36 @@ import userRouter from './routes/user.route';
 
 
 const corsOptions = {
-  origin: process.env.REDIRECT_URL_FRONTEND || 'http://localhost:3000', // Make sure this matches your frontend URL exactly
-  credentials: true, // This is crucial for allowing cookies to be sent
+  origin: process.env.REDIRECT_URL_FRONTEND,
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   exposedHeaders: ['Set-Cookie'],
-  secure: process.env.NODE_ENV === 'production'
+  secure: true, // Always true in production
+  maxAge: 24 * 60 * 60, // Pre-flight request caching
+  optionsSuccessStatus: 200
 };
 
 
 const app = express();
 app.use(cors(corsOptions));
-app.use(morgan('dev'));
-app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
+// app.use(morgan('dev'));
+// app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(express.json());
 
 app.use(session({
-  secret: process.env.SESSION_SECRET || "keyboard cat",
+  secret: process.env.SESSION_SECRET || 'secret',
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === 'production', // true in production
+    secure: true, // Always use secure cookies in production
     httpOnly: true,
-    sameSite: 'none', // or 'strict', depending on your needs
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  }
+    sameSite: 'none', // Adjust based on your domain setup
+    maxAge: 24 * 60 * 60 * 1000,
+    domain: process.env.COOKIE_DOMAIN // Add your domain
+  },
+  name: 'sessionId', // Change default connect.sid name
+  proxy: true // Trust the reverse proxy
 }));
 
 app.use(passport.initialize());
