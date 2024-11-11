@@ -4,6 +4,15 @@ import jwt from "jsonwebtoken";
 
 export const authRouter: Router = express.Router();
 
+const getDomainFromUrl = (url: string): string => {
+    try {
+        const urlObject = new URL(url);
+        return urlObject.hostname;
+    } catch (error) {
+        return 'localhost';
+    }
+};
+
 authRouter.get(
     '/google',
     passport.authenticate('google', { scope: ['profile', 'email'] })
@@ -16,9 +25,13 @@ authRouter.get(
         const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
         console.log("Requested URL:", fullUrl);
 
+
+
         try {
             console.log(req.user);
 
+            const frontendUrl = process.env.REDIRECT_URL_FRONTEND || 'http://localhost:3000';
+            const frontendDomain = getDomainFromUrl(frontendUrl);
             const token = jwt.sign(
                 { user: req.user },
                 process.env.JWT_SECRET || '',
@@ -39,19 +52,28 @@ authRouter.get(
             //     }
             // );
 
+            // res.cookie('jwtToken', token, {
+            //     httpOnly: true,
+            //     secure: true,
+            //     sameSite: 'none',
+            //     maxAge: 24 * 60 * 60 * 1000,
+            //     path: '/',
+            //     // httpOnly: true,
+            //     // secure: true,
+
+            //     // sameSite: "none",
+            //     // maxAge: 2 * 60 * 60 * 1000, // 2 hours
+            //     // path: '/',
+            //     // domain: process.env.NODE_ENV === 'production' ? process.env.REDIRECT_URL_FRONTEND : undefined
+            // });
+
             res.cookie('jwtToken', token, {
                 httpOnly: true,
                 secure: true,
                 sameSite: 'none',
-                maxAge: 24 * 60 * 60 * 1000,
+                maxAge: 24 * 60 * 60 * 1000, // 24 hours
                 path: '/',
-                // httpOnly: true,
-                // secure: true,
-
-                // sameSite: "none",
-                // maxAge: 2 * 60 * 60 * 1000, // 2 hours
-                // path: '/',
-                // domain: process.env.NODE_ENV === 'production' ? process.env.REDIRECT_URL_FRONTEND : undefined
+                domain: frontendDomain === 'localhost' ? undefined : `.${frontendDomain}`
             });
 
             console.log("token", token);
