@@ -11,8 +11,10 @@ authRouter.get(
 
 authRouter.get(
     '/google/callback',
-    passport.authenticate('google', { failureRedirect: '/login' }),
+    passport.authenticate('google', { failureRedirect: '/auth' }),
     (req: Request, res: Response) => {
+        console.log("Requested URL:", req.originalUrl);
+
         try {
             console.log(req.user);
 
