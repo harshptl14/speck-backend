@@ -36,7 +36,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === 'production', // true in production
+    secure: process.env.ENVIRONMENT === 'production', // true in production
     httpOnly: true,
     sameSite: 'lax', // or 'strict', depending on your needs
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
