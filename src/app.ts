@@ -43,7 +43,7 @@ app.use(session({
   cookie: {
     secure: true, // Railway uses HTTPS
     httpOnly: true,
-    sameSite: 'none', // Important for cross-origin requests
+    sameSite: 'lax', // Important for cross-origin requests
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
     path: '/',
     // Don't set domain explicitly when using Railway
