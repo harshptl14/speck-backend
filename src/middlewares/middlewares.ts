@@ -19,10 +19,10 @@ export const errorHandler = (
     success: false,
     status,
     message: err.message,
-    ...(process.env.ENVIRONMENT === 'development' ? {
+    ...(process.env.NODE_ENV === 'development' ? {
       stack: err.stack
     } : {
-      stack: process.env.ENVIRONMENT === 'production' ? '🥞' : err.stack
+      stack: process.env.NODE_ENV === 'production' ? '🥞' : err.stack
     })
   });
 };

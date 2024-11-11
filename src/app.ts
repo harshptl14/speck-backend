@@ -23,7 +23,7 @@ const corsOptions = {
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   exposedHeaders: ['Set-Cookie'],
-  secure: process.env.ENVIRONMENT === 'production'
+  secure: process.env.NODE_ENV === 'production'
 };
 
 
@@ -38,7 +38,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.ENVIRONMENT === 'production', // true in production
+    secure: process.env.NODE_ENV === 'production', // true in production
     httpOnly: true,
     sameSite: 'none', // or 'strict', depending on your needs
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
