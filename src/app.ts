@@ -18,8 +18,11 @@ import userRouter from './routes/user.route';
 import { requireHTTPS } from './middlewares/middlewares';
 
 
-const corsOptions = {
-  origin: process.env.REDIRECT_URL_FRONTEND,
+const corsOptions: cors.CorsOptions = {
+  origin: [
+    process.env.REDIRECT_URL_FRONTEND || '',
+    process.env.URL_FRONTEND || ''
+  ].filter(url => url !== ''),
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
