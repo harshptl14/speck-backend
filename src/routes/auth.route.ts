@@ -121,16 +121,36 @@ authRouter.get('/google/success', (req: Request, res: Response) => {
     }
 });
 
+// authRouter.get('/logout', function (req: Request, res: Response, next: NextFunction) {
+//     req.logout(function (err) {
+//         if (err) { return next(err); }
+//         res.clearCookie('jwtToken');
+//         req.session.destroy(function (err) {
+//             if (err) { return next(err); }
+//             res.redirect(process.env.REDIRECT_URL_FRONTEND || '/');
+//         });
+//     });
+// });
+
 authRouter.get('/logout', function (req: Request, res: Response, next: NextFunction) {
     req.logout(function (err) {
         if (err) { return next(err); }
-        res.clearCookie('jwtToken');
+
+        // Clear the cookie with the specified domain, path, and SameSite attributes
+        res.clearCookie('jwtToken', {
+            domain: process.env.MAIN_DOMAIN, // Ensure this matches the domain used when setting the cookie
+            path: '/',
+            secure: true,
+            sameSite: 'none'
+        });
+
         req.session.destroy(function (err) {
             if (err) { return next(err); }
-            res.redirect(process.env.REDIRECT_URL_FRONTEND || '/');
+            res.redirect(process.env.URL_FRONTEND || '/');
         });
     });
 });
+
 
 authRouter.post('/verify-token', (req, res, next) => {
     debugger;
