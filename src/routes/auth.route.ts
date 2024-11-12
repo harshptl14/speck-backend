@@ -99,7 +99,7 @@ authRouter.get('/google/success', (req: Request, res: Response) => {
         const token = jwt.sign(
             { user: req.user },
             process.env.JWT_SECRET || '',
-            { expiresIn: "2h" },
+            { expiresIn: "10d" },
         );
 
         res.cookie('jwtToken', token, {
