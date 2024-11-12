@@ -103,12 +103,12 @@ authRouter.get('/google/success', (req: Request, res: Response) => {
         );
 
         res.cookie('jwtToken', token, {
-            httpOnly: true,
+            // httpOnly: true,
             secure: true,
             sameSite: 'none',
             maxAge: 24 * 60 * 60 * 1000, // 24 hours
             path: '/',
-            domain: 'speck-frontend-production.up.railway.app',
+            domain: process.env.MAIN_DOMAIN,
         });
 
         res.redirect(process.env.REDIRECT_URL_FRONTEND || '/');
