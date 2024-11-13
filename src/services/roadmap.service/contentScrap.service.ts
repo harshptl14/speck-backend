@@ -76,11 +76,22 @@ async function createVideoQuery(roadmapName: string | undefined, topicName: stri
     // Return the answer
 
     const getVideoQuery = PromptTemplate.fromTemplate(`
-    Please provide a YouTube video query for the following subtopic name:
-        - Subtopic name: {subtopic}
+        Generate a highly specific YouTube search query to find a video about:
+        
+        Topic: {topic} in {roadmap}
+        Specific Focus: {subtopic}
     
-    Output only the query string nothing else, JUST STRING WITH QUERY. Ensure the query is optimized to retrieve the most relevant video content.
-        `);
+        Requirements for the query:
+        - Include "tutorial" OR "explained" OR "guide"
+        - Must be education-focused
+        - Target beginner to intermediate level
+        - Prefer recent content (add "2024" OR "2023")
+        - Include key technical terms
+        - Add "programming" or "development" if tech-related
+        
+        Format: Return ONLY the search query string, optimized with quotes and operators where needed.
+        Example format: "react hooks useState tutorial 2024" OR "python decorators explained programming"
+    `);
 
     const chain = getVideoQuery.pipe(groqModel);
 
