@@ -7,9 +7,9 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN pnpm install
-
 COPY prisma ./prisma
+
+RUN pnpm install
 
 RUN npx prisma generate
 
