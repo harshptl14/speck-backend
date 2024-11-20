@@ -6,6 +6,8 @@ import { StringOutputParser } from "@langchain/core/output_parsers";
 import { insertJsonToPrisma } from "./llmToDB";
 import { populateFirstRoadmapTopic } from "./contentScrap.service";
 import { Socket } from 'socket.io';
+
+
 export const createRoadmapFunction = async (userQuery: string, userId: number): Promise<{} | Error> => {
   try {
     const roadmapPrompt = PromptTemplate.fromTemplate(`
@@ -194,7 +196,7 @@ Remember:
       console.log("roadmap name, prompt", courseNameResponse);
 
       // Insert the JSON data into the database
-      const roadmapid = await insertJsonToPrisma(
+      const llmToDb: llmToDBResponse = await insertJsonToPrisma(
         JSON.parse(response),
         combinedResponse,
         userId,
@@ -203,7 +205,7 @@ Remember:
 
       console.log("roadmap Created and inserted into the database, now getting content for the first topic");
 
-      await populateFirstRoadmapTopic(roadmapid);
+      await populateFirstRoadmapTopic(llmToDb?.id);
 
       return { message: "Roadmap Created Successfully" };
 
@@ -216,7 +218,14 @@ Remember:
 
 
 
-export const createRoadmapWithStatusUpdates = async (userQuery: string, userId: number, socket: Socket): Promise<{} | Error> => {
+export const createRoadmapWithStatusUpdates = async (userQuery: string, userId: number, socket: Socket): Promise<{
+  message: string;
+  roadmap: {
+    name: string,
+    id: number,
+  } | {};
+  roadmapExists: boolean;
+} | Error> => {
   try {
     socket.emit('roadmapProgress', { progress: 0, message: 'Starting roadmap creation...' });
     const roadmapPrompt = PromptTemplate.fromTemplate(`
@@ -354,6 +363,7 @@ Remember:
       return {
         message: `Roadmap for ${userQuery} already exists in the database.`,
         roadmap: isRoadmapAvailable,
+        roadmapExists: true,
       };
 
     } else {
@@ -410,7 +420,7 @@ Remember:
 
       // Insert the JSON data into the database
       socket.emit('roadmapProgress', { progress: 70, message: 'Saving roadmap to database...' });
-      const roadmapid = await insertJsonToPrisma(
+      const llmToDb: llmToDBResponse = await insertJsonToPrisma(
         JSON.parse(response),
         combinedResponse,
         userId,
@@ -420,9 +430,13 @@ Remember:
       console.log("roadmap Created and inserted into the database, now getting content for the first topic");
 
       socket.emit('roadmapProgress', { progress: 75, message: 'Populating initial content...' });
-      await populateFirstRoadmapTopic(roadmapid);
+      await populateFirstRoadmapTopic(llmToDb.id);
       socket.emit('roadmapProgress', { progress: 100, message: 'Roadmap creation complete!' });
-      return { message: 'Roadmap Created Successfully' };
+      return {
+        message: 'Roadmap Created Successfully',
+        roadmap: llmToDb,
+        roadmapExists: false,
+      };
     }
   } catch (error) {
     console.error("An error occurred in roadmapLangChain:", error);
@@ -430,6 +444,10 @@ Remember:
   }
 };
 
+type llmToDBResponse = {
+  name: string;
+  id: number;
+};
 
 type subtopics = {
   name: string;

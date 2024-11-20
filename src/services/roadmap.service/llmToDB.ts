@@ -1,6 +1,6 @@
 import { prisma } from '../../../utils/client';
 
-export async function insertJsonToPrisma(jsonData: any, courseMetadata: any, userId: number, roadmapName: string): Promise<number> {
+export async function insertJsonToPrisma(jsonData: any, courseMetadata: any, userId: number, roadmapName: string): Promise<{ name: string, id: number }> {
     console.log('Inserting data...', jsonData);
     console.log('type of data', typeof jsonData);
     console.log('courseName', roadmapName);
@@ -83,7 +83,10 @@ export async function insertJsonToPrisma(jsonData: any, courseMetadata: any, use
         });
 
         console.log('Data inserted successfully');
-        return roadmap.id;
+        return {
+            name: roadmap.name,
+            id: roadmap.id
+        };
     } catch (error) {
         console.error('Error inserting data:', error);
         throw error;

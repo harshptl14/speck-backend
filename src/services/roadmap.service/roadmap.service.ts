@@ -6,7 +6,14 @@ import { insertJsonToPrisma } from "./llmToDB";
 import { availaleRoadmapInDB } from "./topicExist.service";
 
 // function that calls OpenAI API to get the response
-export const createRoadmapService = async (userQuery: string, userId: number): Promise<{} | Error> => {
+export const createRoadmapService = async (userQuery: string, userId: number): Promise<{
+	message: string;
+	roadmap: {
+		name: string,
+		id: number,
+	} | {};
+	roadmapExists: boolean;
+} | Error> => {
 	// Openai response
 
 	// try {
@@ -28,11 +35,14 @@ export const createRoadmapService = async (userQuery: string, userId: number): P
 
 		if (Object.keys(isRoadmapAvailable).length !== 0) {
 			console.log(`Roadmap for ${userQuery} already exists in the database.`);
-			const returnJsonObject = {
-				message: "Roadmap for " + userQuery + " already exists in the database.",
-				roadmap: isRoadmapAvailable
-			}
-			return returnJsonObject || {};
+			console.log(`Roadmap for ${userQuery} already exists in the database.`);
+			// TODO: Share roadmap details with the 
+
+			return {
+				message: `Roadmap for ${userQuery} already exists in the database.`,
+				roadmap: isRoadmapAvailable,
+				roadmapExists: true,
+			};
 		} else {
 			const roadmapPrompt = `
 Create a comprehensive learning roadmap for mastering ${userQuery}. Your task includes topics and subtopics. Respond with a JSON object only, using the following structure:
@@ -136,7 +146,7 @@ Remember:
 			console.log("Roadmap JSON:", roadmapJson);
 			console.log("Combined Response:", combinedResponse);
 
-			const roadmapId = await insertJsonToPrisma(
+			const llmToDb = await insertJsonToPrisma(
 				roadmapJson,
 				combinedResponse,
 				userId,
@@ -145,9 +155,14 @@ Remember:
 
 			console.log("Roadmap created and inserted into the database, now getting content for the first topic");
 
-			await populateFirstRoadmapTopic(roadmapId);
+			await populateFirstRoadmapTopic(llmToDb.id);
 
-		} return { message: "Roadmap Created Successfully" };
+			return {
+				message: 'Roadmap Created Successfully',
+				roadmap: llmToDb,
+				roadmapExists: false,
+			};
+		}
 	}
 
 	catch (error) {

@@ -1,6 +1,6 @@
 import { Server as HttpServer } from 'http';
 import { Server, Socket } from 'socket.io';
-import { createRoadmapHandler } from '../src/handlers/createRoadmapHandler';
+import { createRoadmapHandler } from '../src/controllers/roadmap.controller';
 import { jwtAuthMiddlewareSocket } from '../src/middlewares/jwtAuthSocket';
 
 // Define `io` 

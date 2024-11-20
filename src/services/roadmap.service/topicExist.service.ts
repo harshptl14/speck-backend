@@ -16,7 +16,7 @@ import { prisma } from "../../../utils/client";
 const similarTopics = async (userQuery: string, commaSeperatedUserRoadmaps: string | null): Promise<string> => {
     const SYSTEM_PROMPT = `You are a expert in finding similar things. Given the user query, and the roadmaps that are already present in the database, you need to tell me whether that query/roadmap is already in the dabase or not. I will provide you with the roadmap name and the id of the roadmap. If you find the similar roadmap based on the user query which is already present in the string that I will give you, you need to return JSON object with the roadmap name and the id of the roadmap. If you don't find the roadmap, you need to return an empty JSON object. Please frovide the JSON object only NO Other thing. HERE IS THE STRING: {commaSeperatedUserRoadmaps}, if {commaSeperatedUserRoadmaps}`;
 
-    const USER_PROMPT = `Here's the user query: {userQuery} \n\n Please find wether this roadmap is already present in the database or not. If it is present, return the JSON with roadmap name and the id of the roadmap. If it is not present, return empty JSON. ONLY JSON OBJECT. NO OTHER THING.`;
+    const USER_PROMPT = `Here's the user query: {userQuery} \n\n Please find wether this roadmap is already present in the database or not. If it is present, return the JSON with roadmap name and the id of the roadmap. If it is not present, return empty JSON. ONLY JSON OBJECT. NO OTHER THING. the object should be like this => name: "roadmap name" and id: "roadmap id"`;
 
     try {
         if (commaSeperatedUserRoadmaps === "") {

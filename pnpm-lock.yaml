@@ -26,12 +26,6 @@ importers:
       '@types/express-session':
         specifier: ^1.18.0
         version: 1.18.0
-      '@types/express-ws':
-        specifier: ^3.0.5
-        version: 3.0.5
-      '@types/ws':
-        specifier: ^8.5.13
-        version: 8.5.13
       axios:
         specifier: ^1.7.2
         version: 1.7.2
@@ -50,9 +44,6 @@ importers:
       express-session:
         specifier: ^1.18.0
         version: 1.18.0
-      express-ws:
-        specifier: ^5.0.2
-        version: 5.0.2(express@4.19.2)
       groq-sdk:
         specifier: ^0.5.0
         version: 0.5.0
@@ -92,9 +83,6 @@ importers:
       socket.io:
         specifier: ^4.8.1
         version: 4.8.1
-      ws:
-        specifier: ^8.18.0
-        version: 8.18.0
       xml2js:
         specifier: ^0.6.2
         version: 0.6.2
@@ -627,9 +615,6 @@ packages:
   '@types/express-session@1.18.0':
     resolution: {integrity: sha512-27JdDRgor6PoYlURY+Y5kCakqp5ulC0kmf7y+QwaY+hv9jEFuQOThgkjyA53RP3jmKuBsH5GR6qEfFmvb8mwOA==}
 
-  '@types/express-ws@3.0.5':
-    resolution: {integrity: sha512-lbWMjoHrm/v85j81UCmb/GNZFO3genxRYBW1Ob7rjRI+zxUBR+4tcFuOpKKsYQ1LYTYiy3356epLeYi/5zxUwA==}
-
   '@types/express@4.17.21':
     resolution: {integrity: sha512-ejlPM315qwLpaQlQDTjPdsUFSc6ZsP4AN6AlWnogPjQ7CVi7PYF3YVz+CY3jE2pwYf7E/7HlDAN0rV2GxTG0HQ==}
 
@@ -717,9 +702,6 @@ packages:
 
   '@types/uuid@9.0.8':
     resolution: {integrity: sha512-jg+97EGIcY9AGHJJRaaPVgetKDsrTgbRjQ5Msgjh/DQKEFl0DtyRr/VCOyD1T2R1MNeWPK/u7JoGhlDZnKBAfA==}
-
-  '@types/ws@8.5.13':
-    resolution: {integrity: sha512-osM/gWBTPKgHV8XkTunnegTRIsvF6owmf5w+JtAfOw472dptdm0dlGv4xCt6GwQRcC2XVOvvRE/0bAoQcL2QkA==}
 
   '@types/xml2js@0.4.14':
     resolution: {integrity: sha512-4YnrRemBShWRO2QjvUin8ESA41rH+9nQGLUGZV/1IDhi3SL9OhdpNC/MrulTWuptXKwhx/aDxE7toV0f/ypIXQ==}
@@ -1474,12 +1456,6 @@ packages:
   express-session@1.18.0:
     resolution: {integrity: sha512-m93QLWr0ju+rOwApSsyso838LQwgfs44QtOP/WBiwtAgPIo/SAh1a5c6nn2BR6mFNZehTpqKDESzP+fRHVbxwQ==}
     engines: {node: '>= 0.8.0'}
-
-  express-ws@5.0.2:
-    resolution: {integrity: sha512-0uvmuk61O9HXgLhGl3QhNSEtRsQevtmbL94/eILaliEADZBHZOQUAiHFrGPrgsjikohyrmSG5g+sCfASTt0lkQ==}
-    engines: {node: '>=4.5.0'}
-    peerDependencies:
-      express: ^4.0.0 || ^5.0.0-alpha.1
 
   express@4.19.2:
     resolution: {integrity: sha512-5T6nhjsT+EOMzuck8JjBHARTHfMht0POzlA60WV2pMD3gyXw2LZnZ+ueGdNxG+0calOJcWKbpFcuzLZ91YWq9Q==}
@@ -3190,18 +3166,6 @@ packages:
     resolution: {integrity: sha512-7KxauUdBmSdWnmpaGFg+ppNjKF8uNLry8LyzjauQDOVONfFLNKrKvQOxZ/VuTIcS/gge/YNahf5RIIQWTSarlg==}
     engines: {node: ^12.13.0 || ^14.15.0 || >=16.0.0}
 
-  ws@7.5.10:
-    resolution: {integrity: sha512-+dbF1tHwZpXcbOJdVOkzLDxZP1ailvSxM6ZweXTegylPny803bFhA+vqBYw4s31NSAk4S2Qz+AKXK9a4wkdjcQ==}
-    engines: {node: '>=8.3.0'}
-    peerDependencies:
-      bufferutil: ^4.0.1
-      utf-8-validate: ^5.0.2
-    peerDependenciesMeta:
-      bufferutil:
-        optional: true
-      utf-8-validate:
-        optional: true
-
   ws@8.17.1:
     resolution: {integrity: sha512-6XQFvXTkbfUOZOKKILFG1PDK2NDQs4azKQl26T0YS5CxqWLgXajbPZ+h4gZekJyRqFU8pvnbAbbs/3TgRPy+GQ==}
     engines: {node: '>=10.0.0'}
@@ -3940,12 +3904,6 @@ snapshots:
     dependencies:
       '@types/express': 4.17.21
 
-  '@types/express-ws@3.0.5':
-    dependencies:
-      '@types/express': 4.17.21
-      '@types/express-serve-static-core': 4.19.5
-      '@types/ws': 8.5.13
-
   '@types/express@4.17.21':
     dependencies:
       '@types/body-parser': 1.19.5
@@ -4060,10 +4018,6 @@ snapshots:
       '@types/superagent': 8.1.7
 
   '@types/uuid@9.0.8': {}
-
-  '@types/ws@8.5.13':
-    dependencies:
-      '@types/node': 20.14.9
 
   '@types/xml2js@0.4.14':
     dependencies:
@@ -5005,14 +4959,6 @@ snapshots:
       uid-safe: 2.1.5
     transitivePeerDependencies:
       - supports-color
-
-  express-ws@5.0.2(express@4.19.2):
-    dependencies:
-      express: 4.19.2
-      ws: 7.5.10
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
 
   express@4.19.2:
     dependencies:
@@ -6838,11 +6784,10 @@ snapshots:
       imurmurhash: 0.1.4
       signal-exit: 3.0.7
 
-  ws@7.5.10: {}
-
   ws@8.17.1: {}
 
-  ws@8.18.0: {}
+  ws@8.18.0:
+    optional: true
 
   xml2js@0.6.2:
     dependencies:
