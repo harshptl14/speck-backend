@@ -1,6 +1,6 @@
 // Library imports
-import morgan from 'morgan';
-import helmet from 'helmet';
+// import morgan from 'morgan';
+// import helmet from 'helmet';
 import express from 'express';
 import cors from 'cors';
 import passport from 'passport';
@@ -17,37 +17,46 @@ import { authRouter } from './routes/auth.route';
 import { useGoogleStrategy } from './configs/auth.config';
 import { jwtAuth } from './middlewares/auth.middlewares';
 import userRouter from './routes/user.route';
+import { requireHTTPS } from './middlewares/middlewares';
 
 
-
-const corsOptions = {
-  origin: 'http://localhost:3000', // Make sure this matches your frontend URL exactly
-  credentials: true, // This is crucial for allowing cookies to be sent
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+const corsOptions: cors.CorsOptions = {
+  origin: [
+    process.env.REDIRECT_URL_FRONTEND || '',
+    process.env.URL_FRONTEND || ''
+  ].filter(url => url !== ''),
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+  exposedHeaders: ['Set-Cookie'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 };
 
 const app = express();
 
 // Use middlewares
 app.use(cors(corsOptions));
-app.use(morgan('dev'));
-app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
+app.use(requireHTTPS);
+// app.use(morgan('dev'));
+// app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(express.json());
-
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || 'keyboard cat',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: process.env.NODE_ENV === 'production', // true in production
-      httpOnly: true,
-      sameSite: 'lax', // or 'strict', depending on your needs
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    },
-  })
-);
+app.set('trust proxy', 1);
+app.use(session({
+  secret: process.env.SESSION_SECRET || "your-secret-key",
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: true, // Railway uses HTTPS
+    httpOnly: true,
+    sameSite: 'none', // Important for cross-origin requests
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    path: '/',
+    // Don't set domain explicitly when using Railway
+    // domain: undefined // Let the browser handle the domain
+  },
+  proxy: true
+}));
 
 app.use(passport.initialize());
 app.use(passport.session());

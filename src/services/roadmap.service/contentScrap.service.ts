@@ -76,11 +76,14 @@ async function createVideoQuery(roadmapName: string | undefined, topicName: stri
     // Return the answer
 
     const getVideoQuery = PromptTemplate.fromTemplate(`
-    Please provide a YouTube video query for the following subtopic name:
-        - Subtopic name: {subtopic}
-    
-    Output only the query string nothing else, JUST STRING WITH QUERY. Ensure the query is optimized to retrieve the most relevant video content.
-        `);
+        Generate a highly specific YouTube search query to find a video about:
+        
+        Topic: {topic} in {roadmap}
+        Specific Focus: {subtopic}
+        
+        Output only the query string nothing else, JUST STRING WITH QUERY.
+        Ensure the query is optimized to retrieve the most relevant video content
+    `);
 
     const chain = getVideoQuery.pipe(groqModel);
 
