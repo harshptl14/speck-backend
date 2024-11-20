@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
 import { createRoadmapService } from '../services/roadmap.service/roadmap.service';
-import { createRoadmapFunction } from '../services/roadmap.service/roadmapLongchain.service';
+import { createRoadmapFunction, createRoadmapWithStatusUpdates } from '../services/roadmap.service/roadmapLongchain.service';
 import { getRoadmapTitleService } from '../services/roadmap.service/getRoadmapTitle.service';
 import { getRoadmapByIdService, getUserRoadmaps, getTopicsByIdService, getSubTopicByIdService, updateSubtopicCompletionService, getRoadmapsInfoByUserIdService, resetRoadmapProgressService } from '../services/roadmap.service/userRoadmaps.service';
 import { createRoadmapSchema, createSubtopicContentSchema, getRoadmapByIdSchema, getRoadmapTitleSchema, getRoadmapOutlineSchema, updateSubtopicCompletionSchema, getRoadmapsInfoByUserIdSchema, resetRoadmapProgressSchema } from '../models/roadmapSchemas';
 import { createSubtopicContentService } from '../services/roadmap.service/contentScrap.service';
 import { redisClient } from '../../utils/client';
+import { Socket } from 'socket.io';
 
 interface User {
     id: number;
@@ -31,6 +32,29 @@ export const createRoadmap = async (req: Request, res: Response) => {
         res.status(500).json({
             message: 'Failed to create roadmap',
         });
+    }
+};
+
+export const createRoadmapHandler = async (prompt: string, socket: Socket) => {
+    // Validate input
+    const validationResult = createRoadmapSchema.safeParse({ prompt });
+    if (!validationResult.success) {
+        socket.emit('roadmapError', { errors: validationResult.error.errors });
+        return;
+    }
+
+    try {
+        const response = await createRoadmapWithStatusUpdates(prompt, socket.data.userId, socket);
+        if (!(response instanceof Error) && response?.roadmapExists) {
+            socket.emit('roadmapExists', response);
+        } else {
+            socket.emit('roadmapComplete', response);
+        }
+        socket.disconnect(); // Disconnect after completion
+    } catch (error) {
+        console.error('Error creating roadmap:', error);
+        socket.emit('roadmapError', { message: 'Failed to create roadmap' });
+        socket.disconnect();
     }
 };
 
