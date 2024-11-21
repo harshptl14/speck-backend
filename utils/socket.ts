@@ -9,7 +9,10 @@ let io: Server;
 export const initSocket = (server: HttpServer): void => {
     io = new Server(server, {
         cors: {
-            origin: `http://localhost:${process.env.FRONTEND_PORT}`,
+            origin: [
+                process.env.REDIRECT_URL_FRONTEND || '',
+                process.env.URL_FRONTEND || ''
+            ].filter(url => url !== ''),
             methods: ['GET', 'POST'],
             allowedHeaders: ['Content-Type', 'Authorization'],
             credentials: true,
