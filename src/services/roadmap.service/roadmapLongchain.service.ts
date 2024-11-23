@@ -36,6 +36,8 @@ Important:
 3. Do not use backticks, markdown formatting, or code blocks.
 4. Ensure all JSON keys and values are properly quoted.
 5. The response should start with '{{' and end with '}}'.
+6. Description for the topics should be plain text, not in Markdown format. and not more than 100 characters.
+7. Topic name should be a string.
 `);
 
     const markdownInfoPrompt = ChatPromptTemplate.fromTemplate(
@@ -125,7 +127,7 @@ Remember:
       You are an expert course curator. Based on {userQuery}, generate a compelling and concise name for the roadmap that captures the essence of the course or learning journey. 
       The name should be clear, engaging, and relevant to the topic, reflecting the core objective of the roadmap. Keep the name concise, typically within 3-6 words.
       
-      Output only the name, without any additional text or formatting.
+      Output only the name, without any additional text or formatting. Please don't give Markdown format, just plain text.
       `
     );
 
