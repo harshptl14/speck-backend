@@ -60,7 +60,7 @@ const sessionConfig: session.SessionOptions = {
     secure: isProduction, // Only true in production
     httpOnly: true,
     sameSite: isProduction ? 'none' as const : 'lax' as const,
-    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    // maxAge: 24 * 60 * 60 * 1000, // 24 hours
     path: '/',
   },
   proxy: isProduction

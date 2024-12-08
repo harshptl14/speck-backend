@@ -12,7 +12,7 @@ const getCookieConfig = (isProduction: boolean) => {
         secure: true,
         sameSite: 'none',
         // sameSite: isProduction ? 'none' : 'lax', // 'none' for production (cross-domain), 'lax' for development
-        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        // maxAge: 24 * 60 * 60 * 1000, // 24 hours
         path: '/',
     } as const;
 
