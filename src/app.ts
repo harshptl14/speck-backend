@@ -17,6 +17,8 @@ import { useGoogleStrategy } from './configs/auth.config';
 import { jwtAuth } from './middlewares/auth.middlewares';
 import userRouter from './routes/user.route';
 import { requireHTTPS } from './middlewares/middlewares';
+import client from "prom-client"
+import { metricsMiddleware } from './metrics';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -68,10 +70,16 @@ const sessionConfig: session.SessionOptions = {
 
 app.use(session(sessionConfig));
 
+app.get("/metrics", async (req, res) => {
+  const metrics = await client.register.metrics();
+  res.set('Content-Type', client.register.contentType);
+  res.end(metrics);
+})
+
 // Passport setup
 app.use(passport.initialize());
 app.use(passport.session());
-
+app.use(metricsMiddleware)
 // Routes
 app.use('/speck/v1/auth', authRouter);
 

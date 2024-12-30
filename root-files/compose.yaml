@@ -1,0 +1,103 @@
+version: "3.9"
+
+services:
+  frontend:
+    container_name: speck-frontend
+    image: frontend
+    build:
+      context: ./speck-frontend
+      dockerfile: frontend.dockerfile
+      target: dev
+    command: pnpm dev
+    ports:
+      - 3000:3000
+    volumes:
+      - ./speck-frontend:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NODE_ENV=development 
+      - NEXT_PUBLIC_SERVER_API=http://backend:4000
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - backend
+    networks:
+      - monitoring-network
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - monitoring-network
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=admin
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    networks:
+      - monitoring-network
+    depends_on:
+      - prometheus
+
+  backend:
+    depends_on:
+      db:
+        condition: service_healthy
+    container_name: speck-backend
+    image: backend
+    build:
+      context: ./speck-backend
+      dockerfile: backend.dockerfile
+    ports:
+      - 4000:4000
+      - 5555:5555
+      - 8080:8080
+    environment: 
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres?schema=public
+    volumes:
+      - ./speck-backend:/app
+      - /app/node_modules
+    networks:
+      - monitoring-network
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - monitoring-network
+
+  db:
+    container_name: speck-db
+    image: postgres:12
+    restart: always
+    env_file:
+      - ./speck-backend/.env
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - monitoring-network
+
+networks:
+  monitoring-network:
+    driver: bridge
+
+volumes:
+  pgdata: {}
+  grafana-storage: {}
