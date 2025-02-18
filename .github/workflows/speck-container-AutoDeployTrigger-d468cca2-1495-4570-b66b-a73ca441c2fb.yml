@@ -36,7 +36,6 @@ jobs:
         with:
           appSourcePath: ${{ github.workspace }}
           _dockerfilePathKey_: _dockerfilePath_
-          acrName: speckcons
           registryUrl: speckcons.azurecr.io
           registryUsername: ${{ secrets.SPECKCONTAINER_REGISTRY_USERNAME }}
           registryPassword: ${{ secrets.SPECKCONTAINER_REGISTRY_PASSWORD }}
