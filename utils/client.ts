@@ -38,15 +38,24 @@ const redisClient: RedisClientType = createClient({
     }
 });
 
+function logToConsole(message: string) {
+    console.log(message);
+    process.stdout.write(''); // Forces immediate flush
+}
+
 // Error handling
 redisClient.on('error', (err) => {
-    console.error('Redis Client Error:', {
+    console.error('Redis Client Error:', JSON.stringify({
         message: err.message,
         code: err.code,
         stack: err.stack,
         timestamp: new Date().toISOString()
-    });
+    }, null, 2));
+    logToConsole(`Redis Client Error: ${err.message}`);
+    process.stdout.write('\n'); // Ensures logs are written properly
 });
+
+
 
 // Connection status monitoring
 redisClient.on('connect', () => {
