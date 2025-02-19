@@ -14,7 +14,7 @@ COPY . .
 RUN pnpm run build  
 # Ensure backend is built before running
 
-EXPOSE 80
+EXPOSE 4000
 EXPOSE 8080
 EXPOSE 5555
 
