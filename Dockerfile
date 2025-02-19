@@ -7,7 +7,7 @@ WORKDIR /app
 
 COPY package*.json ./
 COPY prisma ./prisma
-RUN pnpm install --no-frozen-lockfile
+RUN pnpm i --no-frozen-lockfile
 RUN npx prisma generate
 
 COPY . .
