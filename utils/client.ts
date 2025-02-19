@@ -28,6 +28,7 @@ const redisClient: RedisClientType = createClient({
         tls: true,
         servername: 'speckrd.redis.cache.windows.net',
         rejectUnauthorized: true,
+        port: 6380,
         // Azure Redis requires TLS 1.2
         minVersion: 'TLSv1.2',
         maxVersion: 'TLSv1.3',

@@ -17,5 +17,6 @@ RUN pnpm run build
 EXPOSE 4000
 EXPOSE 8080
 EXPOSE 5555
+EXPOSE 6380
 
 CMD ["sh", "-c", "npx prisma migrate deploy && pnpm run start"]
