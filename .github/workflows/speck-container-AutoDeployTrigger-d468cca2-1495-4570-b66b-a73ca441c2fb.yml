@@ -30,9 +30,11 @@ jobs:
         with:
           appSourcePath: ${{ github.workspace }}
           dockerfilePath: Dockerfile
-          registryUrl: speckcons.azurecr.io  # You need to specify your Azure Container Registry URL here
+          registryUrl: speckcons.azurecr.io
           registryUsername: ${{ secrets.SPECKCONTAINER_REGISTRY_USERNAME }}
           registryPassword: ${{ secrets.SPECKCONTAINER_REGISTRY_PASSWORD }}
           containerAppName: speck-container
           resourceGroup: speck
           imageToBuild: speckcons.azurecr.io/speck-container:${{ github.sha }}
+          targetPort: 4000    # Add this line with your actual port
+          ingress: 'external' # Add this if you need external access
