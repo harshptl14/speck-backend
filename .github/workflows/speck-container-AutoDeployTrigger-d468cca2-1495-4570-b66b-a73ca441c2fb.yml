@@ -35,4 +35,4 @@ jobs:
           registryPassword: ${{ secrets.SPECKCONTAINER_REGISTRY_PASSWORD }}
           containerAppName: speck-container
           resourceGroup: speck
-          imageToBuild: default/speck-container:${{ github.sha }}
+          imageToBuild: speckcons.azurecr.io/speck-container:${{ github.sha }}
