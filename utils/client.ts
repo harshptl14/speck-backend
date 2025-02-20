@@ -15,7 +15,7 @@ let prisma = new PrismaClient()
 
 // const redisClient = new Redis();
 
-export { prisma, }
+export { prisma }
 
 
 // const prisma = new PrismaClient();
