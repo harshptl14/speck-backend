@@ -5,7 +5,7 @@ import { getRoadmapTitleService } from '../services/roadmap.service/getRoadmapTi
 import { getRoadmapByIdService, getUserRoadmaps, getTopicsByIdService, getSubTopicByIdService, updateSubtopicCompletionService, getRoadmapsInfoByUserIdService, resetRoadmapProgressService } from '../services/roadmap.service/userRoadmaps.service';
 import { createRoadmapSchema, createSubtopicContentSchema, getRoadmapByIdSchema, getRoadmapTitleSchema, getRoadmapOutlineSchema, updateSubtopicCompletionSchema, getRoadmapsInfoByUserIdSchema, resetRoadmapProgressSchema } from '../models/roadmapSchemas';
 import { createSubtopicContentService } from '../services/roadmap.service/contentScrap.service';
-import { redisClient } from '../../utils/client';
+// import { redisClient } from '../../utils/client';
 import { Socket } from 'socket.io';
 
 interface User {
@@ -88,12 +88,12 @@ export const createSubtopicContent = async (req: Request, res: Response) => {
 
 export const getSubtopicGenerationProgress = async (req: Request, res: Response) => {
     const { jobId } = req.params;
-    const progress = await redisClient.get(`progress:${jobId}`);
-    if (progress) {
-        res.json({ progress: parseInt(progress) });
-    } else {
-        res.status(404).json({ message: 'Progress not found' });
-    }
+    // const progress = await redisClient.get(`progress:${jobId}`);
+    // if (progress) {
+    //     res.json({ progress: parseInt(progress) });
+    // } else {
+    //     res.status(404).json({ message: 'Progress not found' });
+    // }
 }
 
 export const getMyRoadmaps = async (req: Request, res: Response) => {

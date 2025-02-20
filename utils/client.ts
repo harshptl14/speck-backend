@@ -3,18 +3,19 @@ import { createClient, RedisClientType } from 'redis';
 
 let prisma = new PrismaClient()
 
-const redisClient: RedisClientType = createClient({
-    url: `redis://${process.env.host_redis}:6379`,
-    password: process.env.REDIS_PASSWORD,
-});
+// const redisClient: RedisClientType = createClient({
+//     url: `redis://${process.env.host_redis}:6379`,
+//     // url: `redis://localhost:6379`,
+//     password: process.env.REDIS_PASSWORD,
+// });
 
-redisClient.on('error', (err) => console.log('Redis Client Error', err));
+// redisClient.on('error', (err) => console.log('Redis Client Error', err));
 
-redisClient.connect();
+// redisClient.connect();
 
 // const redisClient = new Redis();
 
-export { prisma, redisClient }
+export { prisma, }
 
 
 // const prisma = new PrismaClient();
