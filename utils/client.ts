@@ -1,19 +1,50 @@
 import { PrismaClient } from '@prisma/client'
 import { createClient, RedisClientType } from 'redis';
 
-let prisma = new PrismaClient()
+// let prisma = new PrismaClient()
+
+// const redisClient: RedisClientType = createClient({
+//     url: process.env.REDIS_URL || 'redis://localhost:6379'
+// });
+
+// redisClient.on('error', (err) => console.log('Redis Client Error', err));
+
+// redisClient.connect();
+
+// // const redisClient = new Redis();
+
+// export { prisma, redisClient }
+
+
+const prisma = new PrismaClient();
+
+// Azure Redis connection URL and password
+const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379'; // Default to local if not set
+const redisPassword = process.env.REDIS_PASSWORD || ''; // Set in your environment variables
 
 const redisClient: RedisClientType = createClient({
-    url: process.env.REDIS_URL || 'redis://localhost:6379'
+    url: redisUrl,
+    password: redisPassword, // Add password if required
+    socket: {
+        reconnectStrategy: (retries) => Math.min(retries * 50, 500), // Exponential backoff for retries
+    }
 });
 
-redisClient.on('error', (err) => console.log('Redis Client Error', err));
+// Error handling
+redisClient.on('error', (err) => console.error('❌ Redis Client Error:', err));
 
-redisClient.connect();
+// Connect to Redis
+(async () => {
+    try {
+        await redisClient.connect();
+        console.log('✅ Connected to Azure Redis successfully!');
+    } catch (error) {
+        console.error('❌ Failed to connect to Redis:', error);
+    }
+})();
 
-// const redisClient = new Redis();
+export { prisma, redisClient };
 
-export { prisma, redisClient }
 
 // import { PrismaClient } from '@prisma/client'
 // import { createClient, RedisClientType } from 'redis';
