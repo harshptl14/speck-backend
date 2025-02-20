@@ -1,23 +1,37 @@
 import { PrismaClient } from '@prisma/client'
 import { createClient, RedisClientType } from 'redis';
 
-let prisma = new PrismaClient()
+// let prisma = new PrismaClient()
 
-const redisClient: RedisClientType = createClient({
-    url: `rediss://${process.env.host_redis}:${process.env.REDIS_PORT || '6380'}`,
-    password: process.env.REDIS_PASSWORD,
-    socket: {
-        tls: true
-    }
-});
+// const redisClient: RedisClientType = createClient({
+//     url: `rediss://${process.env.host_redis}:${process.env.REDIS_PORT || '6380'}`,
+//     password: process.env.REDIS_PASSWORD,
+//     socket: {
+//         tls: true
+//     }
+// });
 
-redisClient.on('error', (err) => console.log('Redis Client Error', err));
+// redisClient.on('error', (err) => console.log('Redis Client Error', err));
 
 // redisClient.connect();
 
-// const redisClient = new Redis();
+// // const redisClient = new Redis();
+
+// export { prisma, redisClient }
+
+import { Redis } from 'ioredis';
+
+let prisma = new PrismaClient()
+
+const redisClient = new Redis({
+    host: process.env.host_redis,
+    port: 6379,
+    password: process.env.REDIS_PASSWORD,
+});
+
 
 export { prisma, redisClient }
+
 
 
 // const prisma = new PrismaClient();
