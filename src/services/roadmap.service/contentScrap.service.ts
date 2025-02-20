@@ -6,7 +6,7 @@ import { PromptTemplate } from "@langchain/core/prompts";
 import { Topic, Prisma, Subtopic } from "@prisma/client";
 import { prisma } from "../../../utils/client";
 import axios from 'axios';
-// import { redisClient } from "../../../utils/client";
+import redisClient from "../../../src/configs/redis.config";
 
 
 // Old way to gathering video and text data
@@ -533,7 +533,7 @@ const getVideoLinks = async (query: string, type: string): Promise<videoDetails[
 export const createSubtopicContentService = async (subtopicId: number, roadmapId: number, jobId: string) => {
 
     const updateProgress = async (percentage: number) => {
-        // await redisClient.set(`progress:${jobId}`, percentage.toString());  // Store progress in Redis
+        await redisClient.set(`progress:${jobId}`, percentage.toString());  // Store progress in Redis
     };
 
     await updateProgress(10);  // 10%: Start of the process
