@@ -1,1 +1,22 @@
-**/node_modules
+# Development
+node_modules
+npm-debug.log
+.git
+.gitignore
+.env
+.env.*
+*.md
+.vscode
+.idea
+
+# Testing
+coverage
+.nyc_output
+test
+
+# Build output
+dist
+
+# Misc
+.DS_Store
+*.log

@@ -1,23 +1,24 @@
-name: Trigger auto deployment for speck-container
+name: Deploy to Azure Container Apps
+
 on:
   push:
-    branches: 
-      [ azure-prod ]
+    branches: [azure-prod]
     paths:
-    - '**'
-    - '.github/workflows/speck-container-AutoDeployTrigger-d468cca2-1495-4570-b66b-a73ca441c2fb.yml'
-  workflow_dispatch:      
+      - "**"
+      - ".github/workflows/speck-container-AutoDeployTrigger-d468cca2-1495-4570-b66b-a73ca441c2fb.yml"
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    permissions: 
+    permissions:
       id-token: write
       contents: read
+
     steps:
-      - name: Checkout to the branch
+      - name: Checkout code
         uses: actions/checkout@v2
-        
+
       - name: Azure Login
         uses: azure/login@v1
         with:
@@ -25,7 +26,7 @@ jobs:
           tenant-id: ${{ secrets.SPECKCONTAINER_AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.SPECKCONTAINER_AZURE_SUBSCRIPTION_ID }}
 
-      - name: Build and push container image to registry
+      - name: Build and deploy to Container Apps
         uses: azure/container-apps-deploy-action@v2
         with:
           appSourcePath: ${{ github.workspace }}
@@ -36,5 +37,17 @@ jobs:
           containerAppName: speck-container
           resourceGroup: speck
           imageToBuild: speckcons.azurecr.io/speck-container:${{ github.sha }}
-          targetPort: 4000    # Add this line with your actual port
-          ingress: 'external' # Add this if you need external access
+          targetPort: 4000
+          ingress: external
+          environmentVariables: |
+            NODE_ENV=production
+            PORT=4000
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            REDIS_URL=${{ secrets.REDIS_URL }}
+            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+            GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
+            SESSION_SECRET=${{ secrets.SESSION_SECRET }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            REDIRECT_URL_FRONTEND=${{ secrets.REDIRECT_URL_FRONTEND }}
