@@ -34,7 +34,6 @@ RUN npm install -g pnpm && \
 
 # Copy built files and prisma
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
 # Set environment variables
@@ -42,8 +41,8 @@ ENV NODE_ENV=production
 ENV PORT=4000
 
 # Create non-root user
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-USER appuser
+# RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+# USER appuser
 
 # Expose port
 EXPOSE 4000
