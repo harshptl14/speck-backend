@@ -34,20 +34,8 @@ jobs:
           registryUrl: speckcons.azurecr.io
           registryUsername: ${{ secrets.SPECKCONTAINER_REGISTRY_USERNAME }}
           registryPassword: ${{ secrets.SPECKCONTAINER_REGISTRY_PASSWORD }}
-          containerAppName: speck-container
+          containerAppName: bootstrap-container-pre-deployment
           resourceGroup: speck
-          imageToBuild: speckcons.azurecr.io/speck-container:${{ github.sha }}
+          imageToBuild: speckcons.azurecr.io/bootstrap-container-pre-deployment:${{ github.sha }}
           targetPort: 4000
           ingress: external
-          environmentVariables: |
-            NODE_ENV=production
-            PORT=4000
-            DATABASE_URL=${{ secrets.DATABASE_URL }}
-            REDIS_URL=${{ secrets.REDIS_URL }}
-            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
-            GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
-            SESSION_SECRET=${{ secrets.SESSION_SECRET }}
-            JWT_SECRET=${{ secrets.JWT_SECRET }}
-            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
-            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
-            REDIRECT_URL_FRONTEND=${{ secrets.REDIRECT_URL_FRONTEND }}
