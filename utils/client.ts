@@ -1,5 +1,5 @@
-// import { PrismaClient } from '@prisma/client'
-// import { createClient, RedisClientType } from 'redis';
+import { PrismaClient } from '@prisma/client'
+import { createClient, RedisClientType } from 'redis';
 
 // let prisma = new PrismaClient()
 
@@ -14,62 +14,38 @@
 // // const redisClient = new Redis();
 
 // export { prisma, redisClient }
-import { createClient, RedisClientType } from 'redis';
-import { PrismaClient } from '@prisma/client'
-
-// Environment variables for cache
-const cacheHostName = process.env.host_redis;
-const cachePassword = process.env.REDIS_PASSWORD;
-
-if (!cacheHostName) throw Error("AZURE_CACHE_FOR_REDIS_HOST_NAME is empty")
-if (!cachePassword) throw Error("AZURE_CACHE_FOR_REDIS_ACCESS_KEY is empty")
-
-// Connection configuration
-const redisClient: RedisClientType = createClient({
-    url: `redis://${cacheHostName}:6379`, // Note: using rediss:// for SSL/TLS
-    password: cachePassword,
-});
-
-redisClient.connect();
-
-let prisma = new PrismaClient()
-
-export { prisma, redisClient }
 
 
-
-
-///--------------
-// const prisma = new PrismaClient();
+const prisma = new PrismaClient();
 
 // Azure Redis connection URL and password
-// const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379'; // Default to local if not set
-// const redisPassword = process.env.REDIS_PASSWORD || ''; // Set in your environment variables
+const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379'; // Default to local if not set
+const redisPassword = process.env.REDIS_PASSWORD || ''; // Set in your environment variables
 
-// const redisClient: RedisClientType = createClient({
-//     url: redisUrl,
-//     password: redisPassword, // Add password if required
-//     socket: {
-//         reconnectStrategy: (retries) => Math.min(retries * 50, 500), // Exponential backoff for retries
-//     }
-// });
+const redisClient: RedisClientType = createClient({
+    url: redisUrl,
+    password: redisPassword, // Add password if required
+    socket: {
+        reconnectStrategy: (retries) => Math.min(retries * 50, 500), // Exponential backoff for retries
+    }
+});
 
-// // Error handling
-// redisClient.on('error', (err) => console.error('❌ Redis Client Error:', err));
+// Error handling
+redisClient.on('error', (err) => console.error('❌ Redis Client Error:', err));
 
-// // Connect to Redis
-// (async () => {
-//     try {
-//         await redisClient.connect();
-//         console.log('✅ Connected to Azure Redis successfully!');
-//     } catch (error) {
-//         console.error('❌ Failed to connect to Redis:', error);
-//     }
-// })();
+// Connect to Redis
+(async () => {
+    try {
+        await redisClient.connect();
+        console.log('✅ Connected to Azure Redis successfully!');
+    } catch (error) {
+        console.error('❌ Failed to connect to Redis:', error);
+    }
+})();
 
-// export { prisma, redisClient };
+export { prisma, redisClient };
 
-//---------
+
 // import { PrismaClient } from '@prisma/client'
 // import { createClient, RedisClientType } from 'redis';
 
