@@ -26,28 +26,11 @@ if (!cachePassword) throw Error("AZURE_CACHE_FOR_REDIS_ACCESS_KEY is empty")
 
 // Connection configuration
 const redisClient: RedisClientType = createClient({
-    url: `rediss://${cacheHostName}:6380`, // Note: using rediss:// for SSL/TLS
+    url: `redis://${cacheHostName}:6379`, // Note: using rediss:// for SSL/TLS
     password: cachePassword,
 });
 
-// Error handling
-redisClient.on('error', (err) => console.error('Redis Client Error:', err));
-
-// Initialize connection
-(async () => {
-    try {
-        await redisClient.connect();
-        console.log('✅ Connected to Azure Redis successfully!');
-    } catch (error) {
-        console.error('❌ Failed to connect to Redis:', error);
-    }
-})();
-
-// Graceful shutdown
-process.on('SIGTERM', async () => {
-    await redisClient.disconnect();
-    await prisma.$disconnect();
-});
+redisClient.connect();
 
 let prisma = new PrismaClient()
 
