@@ -1,5 +1,4 @@
 name: Deploy to Azure Container Apps
-
 on:
   push:
     branches: [azure-prod]
@@ -14,7 +13,6 @@ jobs:
     permissions:
       id-token: write
       contents: read
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -34,8 +32,9 @@ jobs:
           registryUrl: speckcons.azurecr.io
           registryUsername: ${{ secrets.SPECKCONTAINER_REGISTRY_USERNAME }}
           registryPassword: ${{ secrets.SPECKCONTAINER_REGISTRY_PASSWORD }}
-          containerAppName: bootstrap-container-pre-deployment
+          containerAppName: speck-container
           resourceGroup: speck
-          imageToBuild: speckcons.azurecr.io/bootstrap-container-pre-deployment:${{ github.sha }}
+          imageToBuild: speckcons.azurecr.io/speck-container:${{ github.sha }}
           targetPort: 4000
           ingress: external
+          containerName: bootstrap-container-pre-deployment
