@@ -21,14 +21,8 @@ import { createClient, RedisClientType } from 'redis';
 let prisma = new PrismaClient()
 
 const redisClient: RedisClientType = createClient({
-    url: process.env.REDIS_URL || 'rediss://speckrd.redis.cache.windows.net:6380',
+    url: process.env.REDIS_URL,
     password: process.env.REDIS_PASSWORD,
-    socket: {
-        tls: true,
-        rejectUnauthorized: true,
-        // Ensuring TLS 1.2 or higher
-        minVersion: 'TLSv1.2'
-    }
 });
 
 // Error handling
