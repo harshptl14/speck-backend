@@ -1,23 +1,9 @@
-import Redis from 'ioredis';
+// import Redis from 'ioredis';
+import { createClient } from 'redis';
 
-const redisClient = new Redis(
-    process.env.REDIS_URL!, {
-    tls: {
-        rejectUnauthorized: false, // Required for Azure Redis SSL
-    },
-    connectTimeout: 20000,
-    maxRetriesPerRequest: 3,
-    retryStrategy(times) {
-        const delay = Math.min(times * 50, 2000);
-        return delay;
-    },
-    reconnectOnError(err) {
-        const targetError = 'READONLY';
-        if (err.message.includes(targetError)) {
-            return true;
-        }
-        return false;
-    },
+const redisClient = createClient({
+    url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
+    password: process.env.REDIS_PASSWORD
 });
 
 redisClient.on('error', (err) => {
