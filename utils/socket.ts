@@ -1,31 +1,32 @@
+import { Server } from 'socket.io';
 import { Server as HttpServer } from 'http';
-import { Server, Socket } from 'socket.io';
 import { createRoadmapHandler } from '../src/controllers/roadmap.controller';
 import { jwtAuthMiddlewareSocket } from '../src/middlewares/jwtAuthSocket';
 
-// Define `io` 
-let io: Server;
-
-export const initSocket = (server: HttpServer): void => {
-    io = new Server(server, {
+export const initSocket = (httpServer: HttpServer) => {
+    const io = new Server(httpServer, {
         cors: {
-            origin: [
-                process.env.REDIRECT_URL_FRONTEND || '',
-                process.env.URL_FRONTEND || ''
-            ].filter(url => url !== ''),
+            origin: process.env.NODE_ENV === 'production'
+                ? [
+                    process.env.REDIRECT_URL_FRONTEND || '',
+                    process.env.URL_FRONTEND || ''
+                ].filter(url => url !== '')
+                : 'http://localhost:3000',
             methods: ['GET', 'POST'],
-            allowedHeaders: ['Content-Type', 'Authorization'],
-            credentials: true,
-        },
+            credentials: true
+        }
     });
 
     // Middleware for authenticating WebSocket connections
     io.use(jwtAuthMiddlewareSocket);
 
     // Handle Socket.IO connections
-    io.on('connection', (socket: Socket) => {
-        const userId = socket.data.userId;
-        console.log(`User connected: ${socket.id}, User ID: ${userId}`);
+    io.on('connection', (socket) => {
+        console.log('A user connected');
+
+        socket.on('disconnect', () => {
+            console.log('User disconnected');
+        });
 
         // Event listener for 'createRoadmap'
         socket.on('createRoadmap', async (data: { prompt: string }) => {
@@ -36,13 +37,7 @@ export const initSocket = (server: HttpServer): void => {
                 socket.emit('roadmapError', { message: 'Failed to create roadmap' });
             }
         });
-
-        // Listener for disconnection
-        socket.on('disconnect', () => {
-            console.log(`User disconnected: ${socket.id}`);
-        });
     });
-};
 
-// Export `io` for access in other modules if necessary
-export { io };
+    return io;
+};

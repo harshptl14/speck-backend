@@ -1,9 +1,11 @@
-import app from './app';
+import { app, server } from './app';
 
-const port = process.env.PORT || 3001;
-app.listen(port, () => {
+const PORT = process.env.PORT || 4000;
+
+server.listen(PORT, () => {
   /* eslint-disable no-console */
-  console.log(`Listening: http://localhost:${port}`);
+  console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode`);
+  console.log(`Listening: http://localhost:${PORT}`);
   /* eslint-enable no-console */
 });
 

@@ -94,14 +94,7 @@ app.use('/speck/v1/user', jwtAuth, userRouter);
 app.use(middlewares.notFound);
 app.use(middlewares.errorHandler);
 
-// Server setup
 const server = http.createServer(app);
 initSocket(server);
 
-const SOCKET_PORT = process.env.SOCKET_PORT || 3001; // Fallback port for local development
-server.listen(SOCKET_PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode`);
-  console.log(`Socket Server listening on port ${SOCKET_PORT}`);
-});
-
-export default app;
+export { app, server };
