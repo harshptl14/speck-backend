@@ -5,8 +5,8 @@
   "main": "dist/src/index.js",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "build": "prisma generate && tsc",
     "start": "node dist/src/index.js",
+    "build": "npx prisma generate && npx prisma migrate deploy && node -e \"require('./dist/prisma/seed.js').seed().catch(console.error)\" && tsc",
     "dev": "nodemon src/index.ts",
     "lint": "eslint --fix src test",
     "test": "jest",
