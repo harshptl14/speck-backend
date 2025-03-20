@@ -23,11 +23,35 @@ jobs:
         with:
           node-version: '18.x'
 
+      # Login to Azure to get app settings
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_16AC696907474106AFCD1C1298C2EDC8 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_4BE358005B864C25A8DDF39AD2E7AFE9 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_4BF31E692ED746D98BF376D0C9C45BCB }}
+
+      # Extract app settings from Azure
+      - name: Get App Settings from Azure
+        shell: pwsh
+        run: |
+          $resourceGroup = "YOUR_RESOURCE_GROUP_NAME" # Replace with your resource group name
+          $appSettings = az webapp config appsettings list --name speck-backend --resource-group $resourceGroup | ConvertFrom-Json
+          
+          # Create a .env file with the settings
+          foreach($setting in $appSettings) {
+            Add-Content -Path .env -Value "$($setting.name)=$($setting.value)"
+            # Also set as environment variable for current process
+            echo "Setting environment variable: $($setting.name)"
+            echo "$($setting.name)=$($setting.value)" >> $env:GITHUB_ENV
+          }
+
       - name: npm install, build, and test
         run: |
           npm install
           npm run build --if-present
           npm run test --if-present
+        # Environment variables are already set from the previous step
       
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
