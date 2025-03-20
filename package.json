@@ -6,7 +6,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "start": "node dist/src/index.js",
-    "build": "npx prisma generate && npx prisma migrate deploy && node -e \"require('./dist/prisma/seed.js').seed().catch(console.error)\" && tsc",
+    "build": "npx prisma generate && npx prisma migrate deploy && (if [ ! -f .seeded ]; then ts-node prisma/seed.ts && touch .seeded; else echo 'Already seeded'; fi) && tsc",
     "dev": "nodemon src/index.ts",
     "lint": "eslint --fix src test",
     "test": "jest",
