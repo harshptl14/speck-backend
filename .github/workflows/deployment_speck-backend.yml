@@ -23,19 +23,17 @@ jobs:
         with:
           node-version: '18.x'
 
-      # Login to Azure to get app settings
+      # Login to Azure using service principal
       - name: Login to Azure
-        uses: azure/login@v2
+        uses: azure/login@v1
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_16AC696907474106AFCD1C1298C2EDC8 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_4BE358005B864C25A8DDF39AD2E7AFE9 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_4BF31E692ED746D98BF376D0C9C45BCB }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       # Extract app settings from Azure
       - name: Get App Settings from Azure
         shell: pwsh
         run: |
-          $resourceGroup = "YOUR_RESOURCE_GROUP_NAME" # Replace with your resource group name
+          $resourceGroup = "MyNodeApp-ResourceGroup" # Replace with your resource group name
           $appSettings = az webapp config appsettings list --name speck-backend --resource-group $resourceGroup | ConvertFrom-Json
           
           # Create a .env file with the settings
@@ -66,7 +64,6 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write #This is required for requesting the JWT
       contents: read #This is required for actions/checkout
 
     steps:
@@ -76,11 +73,9 @@ jobs:
           name: node-app
       
       - name: Login to Azure
-        uses: azure/login@v2
+        uses: azure/login@v1
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_16AC696907474106AFCD1C1298C2EDC8 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_4BE358005B864C25A8DDF39AD2E7AFE9 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_4BF31E692ED746D98BF376D0C9C45BCB }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
@@ -89,4 +84,3 @@ jobs:
           app-name: 'speck-backend'
           slot-name: 'Production'
           package: .
-          
