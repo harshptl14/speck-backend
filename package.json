@@ -33,6 +33,7 @@
     "body-parser": "^1.20.3",
     "cheerio": "^1.0.0",
     "cors": "^2.8.5",
+    "depd": "^2.0.0",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-rate-limit": "^7.4.1",
@@ -75,5 +76,6 @@
   },
   "engines": {
     "node": ">=18.0.0"
-  }
+  },
+  "packageManager": "pnpm@10.4.0+sha512.6b849d0787d97f8f4e1f03a9b8ff8f038e79e153d6f11ae539ae7c435ff9e796df6a862c991502695c7f9e8fac8aeafc1ac5a8dab47e36148d183832d886dd52"
 }
