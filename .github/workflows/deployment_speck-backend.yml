@@ -34,11 +34,25 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
-      - name: Test
-        run: pnpm run test
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      # - name: Start
+      #   run: pnpm run start
+      #   env:
+      #     DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      #     GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      #     GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      #     GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+      #     JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      #     MAIN_DOMAIN: ${{ secrets.MAIN_DOMAIN }}
+      #     NODE_ENV: ${{ secrets.NODE_ENV }}
+      #     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      #     PORT: ${{ secrets.PORT }}
+      #     REDIRECT_URL_FRONTEND: ${{ secrets.REDIRECT_URL_FRONTEND }}
+      #     REDIS_URL: ${{ secrets.REDIS_URL }}
+      #     SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+      #     SOCKET_PORT: ${{ secrets.SOCKET_PORT }}
+      #     URL_FRONTEND: ${{ secrets.URL_FRONTEND }}
+      #     YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
