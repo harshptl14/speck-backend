@@ -6,6 +6,11 @@ on:
       - deployment
   workflow_dispatch:
 
+# Add permissions at the workflow level for OIDC authentication
+permissions:
+  id-token: write  # Required for Azure login
+  contents: read   # Required for checkout
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
