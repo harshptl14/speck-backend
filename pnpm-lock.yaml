@@ -83,6 +83,9 @@ importers:
       langchain:
         specifier: ^0.2.11
         version: 0.2.11(@langchain/groq@0.0.13)(axios@1.7.2)(cheerio@1.0.0)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.52.4)(redis@4.7.0)(ws@8.18.0)(youtube-transcript@1.2.1)
+      merge-descriptors:
+        specifier: ^2.0.0
+        version: 2.0.0
       morgan:
         specifier: ^1.10.0
         version: 1.10.0
@@ -2353,6 +2356,10 @@ packages:
 
   merge-descriptors@1.0.1:
     resolution: {integrity: sha512-cCi6g3/Zr1iqQi6ySbseM1Xvooa98N0w31jzUYrXPX2xqObmFGHJ0tQ5u74H3mVh7wLouTseZyYIq39g8cNp1w==}
+
+  merge-descriptors@2.0.0:
+    resolution: {integrity: sha512-Snk314V5ayFLhp3fkUREub6WtjBfPdCPY1Ln8/8munuLuiYhsABgBVWsozAG+MWMbVEvcdcpbi9R7ww22l9Q3g==}
+    engines: {node: '>=18'}
 
   merge-stream@2.0.0:
     resolution: {integrity: sha512-abv/qOcuPfk3URPfDzmZU1LKmuw8kT+0nIHvKrKgFrwifol/doWcdA4ZqsWQ8ENrFKkd67Mfpo/LovbIUsbt3w==}
@@ -5971,6 +5978,8 @@ snapshots:
   media-typer@0.3.0: {}
 
   merge-descriptors@1.0.1: {}
+
+  merge-descriptors@2.0.0: {}
 
   merge-stream@2.0.0: {}
 

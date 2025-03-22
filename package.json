@@ -43,6 +43,7 @@
     "ioredis": "^5.4.1",
     "jsonwebtoken": "^9.0.2",
     "langchain": "^0.2.11",
+    "merge-descriptors": "^2.0.0",
     "morgan": "^1.10.0",
     "openai": "^4.52.4",
     "passport": "^0.7.0",
