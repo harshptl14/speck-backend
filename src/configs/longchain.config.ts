@@ -5,7 +5,7 @@ require('dotenv').config();
 
 export const groqModel = new ChatGroq({
     apiKey: process.env.GROQ_API_KEY,
-    model: "llama-3.1-70b-versatile",
+    model: "llama-3.3-70b-versatile",
 });
 
 // export const openaiModel = new ChatOpenAI({
