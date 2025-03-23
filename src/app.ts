@@ -146,13 +146,13 @@ const corsOptions: cors.CorsOptions = {
 
 const app = express();
 
-// Create HTTP server first
+// Create HTTP server
 const server = http.createServer(app);
 
 // Initialize Socket.IO before any middleware
 initSocket(server);
 
-// Now apply middleware
+// Apply middleware after Socket.IO
 app.use(cors(corsOptions));
 app.use(express.json());
 
@@ -164,7 +164,12 @@ if (isProduction) {
   app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
 }
 
-app.use(helmet());
+// Customize helmet to avoid interfering with Socket.IO
+app.use(
+  helmet({
+    contentSecurityPolicy: false, // Disable CSP to avoid blocking polling requests
+  })
+);
 
 const RedisStore = connectRedis;
 
