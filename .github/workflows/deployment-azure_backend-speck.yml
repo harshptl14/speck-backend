@@ -29,8 +29,22 @@ jobs:
           npm run build --if-present
           npm run test --if-present
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          CALLBACK_URL: ${{ secrets.CALLBACK_URL }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          MAIN_DOMAIN: ${{ secrets.MAIN_DOMAIN }}
+          NODE_ENV: ${{ secrets.NODE_ENV }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PORT: ${{ secrets.PORT }}
+          REDIRECT_URL_FRONTEND: ${{ secrets.REDIRECT_URL_FRONTEND }}
+          REDIS_URL: ${{ secrets.REDIS_URL }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+          SOCKET_PORT: ${{ secrets.SOCKET_PORT }}
+          URL_FRONTEND: ${{ secrets.URL_FRONTEND }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
 
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r
