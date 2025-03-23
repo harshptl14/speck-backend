@@ -39,13 +39,17 @@ import { Socket } from 'socket.io';
 import jwt from 'jsonwebtoken';
 
 export const jwtAuthMiddlewareSocket = (socket: Socket, next: (err?: Error) => void) => {
-    // const token = socket.handshake.auth?.token;
-    const token = socket.handshake.auth.token || socket.handshake.headers.authorization;
+    console.log('Socket.IO handshake auth:', socket.handshake.auth);
+    console.log('Socket.IO handshake headers:', socket.handshake.headers);
+
+    const token = socket.handshake.auth?.token || socket.handshake.headers?.authorization;
 
     if (!token) {
         console.error('Socket.IO auth error: No token provided');
         return next(new Error('Authentication error: No token provided'));
     }
+
+    console.log('Token received:', token);
 
     const tokenParts = token.split(' ');
     if (tokenParts.length !== 2 || tokenParts[0] !== 'Bearer') {
@@ -57,6 +61,7 @@ export const jwtAuthMiddlewareSocket = (socket: Socket, next: (err?: Error) => v
 
     try {
         const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET || 'your-jwt-secret') as { user: { id: number } };
+        console.log('Decoded token:', decoded);
         socket.data.userId = decoded.user.id;
         console.log(`Socket.IO auth success: User ID ${decoded.user.id}`);
         next();
