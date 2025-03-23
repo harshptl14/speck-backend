@@ -146,14 +146,15 @@ const corsOptions: cors.CorsOptions = {
 
 const app = express();
 
-// Middleware
+// Create HTTP server first
+const server = http.createServer(app);
+
+// Initialize Socket.IO before any middleware
+initSocket(server);
+
+// Now apply middleware
 app.use(cors(corsOptions));
 app.use(express.json());
-
-// Debug route to confirm /socket isn't being handled by Express
-app.get('/socket', (req, res) => {
-  res.status(200).send('This should not be reached; Socket.IO should handle /socket');
-});
 
 if (isProduction) {
   app.use(requireHTTPS);
@@ -162,9 +163,6 @@ if (isProduction) {
   app.use(morgan('dev'));
   app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
 }
-
-const server = http.createServer(app);
-initSocket(server);
 
 app.use(helmet());
 

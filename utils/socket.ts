@@ -72,11 +72,15 @@ export const initSocket = (server: HttpServer): void => {
     console.log('Socket.IO initialized with path /socket');
 
     io.engine.on('connection_error', (err) => {
-        console.error('Socket.IO connection error:', err);
+        console.error('Socket.IO connection error:', err.message, err.context);
     });
 
     io.engine.on('initial_headers', (headers, req) => {
-        console.log('Socket.IO initial headers:', headers, req.url);
+        console.log('Socket.IO initial headers:', headers, 'URL:', req.url);
+    });
+
+    io.engine.on('connection', () => {
+        console.log('Socket.IO engine connection established');
     });
 
     io.use(jwtAuthMiddlewareSocket);
