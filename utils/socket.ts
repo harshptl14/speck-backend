@@ -69,6 +69,8 @@ export const initSocket = (server: HttpServer): void => {
         transports: ['websocket', 'polling'],
     });
 
+    console.log('Socket.IO initialized with path /socket');
+
     io.use(jwtAuthMiddlewareSocket);
 
     io.on('connection', (socket: Socket) => {
@@ -76,6 +78,7 @@ export const initSocket = (server: HttpServer): void => {
         console.log(`User connected: ${socket.id}, User ID: ${userId}`);
 
         socket.on('createRoadmap', async (data: { prompt: string }) => {
+            console.log(`Received createRoadmap event from user ${userId}:`, data);
             try {
                 await createRoadmapHandler(data.prompt, socket);
                 console.log(`Roadmap created for user ${userId}`);

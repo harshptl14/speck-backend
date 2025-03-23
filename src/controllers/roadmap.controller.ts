@@ -50,11 +50,11 @@ export const createRoadmapHandler = async (prompt: string, socket: Socket) => {
         } else {
             socket.emit('roadmapComplete', response);
         }
-        socket.disconnect(); // Disconnect after completion
+        // socket.disconnect(); // Disconnect after completion
     } catch (error) {
         console.error('Error creating roadmap:', error);
         socket.emit('roadmapError', { message: 'Failed to create roadmap' });
-        socket.disconnect();
+        // socket.disconnect();
     }
 };
 

@@ -114,7 +114,7 @@ import session from 'express-session';
 import http from 'http';
 import morgan from 'morgan';
 import helmet from 'helmet';
-import connectRedis from 'connect-redis'; // Default import
+import connectRedis from 'connect-redis';
 import { initSocket } from '../utils/socket';
 import { redisClient } from '../utils/client';
 require('dotenv').config();
@@ -149,8 +149,8 @@ const app = express();
 // Middleware
 app.use(cors(corsOptions));
 app.use(express.json());
-app.use(helmet());
 
+// Move helmet after Socket.IO to avoid interference with WebSocket/polling
 if (isProduction) {
   app.use(requireHTTPS);
   app.set('trust proxy', 1);
@@ -159,11 +159,17 @@ if (isProduction) {
   app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
 }
 
-// Redis Store for sessions
-const RedisStore = connectRedis; // Alias for clarity, no need to call it yet
+// Initialize server and Socket.IO before other middleware
+const server = http.createServer(app);
+initSocket(server);
+
+// Apply helmet after Socket.IO initialization
+app.use(helmet());
+
+const RedisStore = connectRedis;
 
 const sessionConfig: session.SessionOptions = {
-  store: new RedisStore({ client: redisClient }), // Use `new` here
+  store: new RedisStore({ client: redisClient }),
   secret: process.env.SESSION_SECRET || 'your-secret-key',
   resave: false,
   saveUninitialized: false,
@@ -178,7 +184,6 @@ const sessionConfig: session.SessionOptions = {
 
 app.use(session(sessionConfig));
 
-// Passport
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -201,9 +206,5 @@ app.use('/speck/v1/user', jwtAuth, userRouter);
 // Error handling
 app.use(middlewares.notFound);
 app.use(middlewares.errorHandler);
-
-// Server with Socket.IO
-const server = http.createServer(app);
-initSocket(server);
 
 export { app, server };

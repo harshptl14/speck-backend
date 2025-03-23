@@ -55,18 +55,17 @@ import { createClient, RedisClientType } from 'redis';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-// Clean REDIS_URL by removing ?ssl=true if present
 const redisUrl = (process.env.REDIS_URL || 'redis://localhost:6379').split('?')[0];
 
 const prisma = new PrismaClient();
 
 const redisClient: RedisClientType = createClient({
-    url: redisUrl, // e.g., redis://default:<password>@speck-redis.redis.cache.windows.net:6380
+    url: redisUrl,
     socket: {
         tls: isProduction,
-        rejectUnauthorized: true, // Enforce strict TLS validation (Azure certs are valid)
-        minVersion: 'TLSv1.2', // Match Azure's minimum TLS version
-        keepAlive: 5000, // Send keep-alive every 5s (Azure idle timeout is 10min)
+        rejectUnauthorized: true,
+        minVersion: 'TLSv1.2',
+        keepAlive: 5000,
         reconnectStrategy: (retries) => {
             if (retries > 10) {
                 console.error('Max Redis reconnection attempts reached');
@@ -80,7 +79,7 @@ const redisClient: RedisClientType = createClient({
 });
 
 redisClient.on('error', (err) => {
-    console.error('Redis Client Error:', err);
+    console.error('Redis Client Error:', err.message, err.stack);
 });
 
 redisClient.on('connect', () => {
@@ -95,27 +94,37 @@ redisClient.on('end', () => {
     console.log('Redis connection closed unexpectedly');
 });
 
-// Periodic ping to prevent idle timeout
 if (isProduction) {
     setInterval(async () => {
         try {
+            if (!redisClient.isOpen) {
+                console.log('Redis client is not open, attempting to reconnect...');
+                await redisClient.connect();
+            }
             await redisClient.ping();
             console.log('Redis ping successful');
         } catch (err) {
-            console.error('Redis ping failed:', err);
+            if (err instanceof Error) {
+                console.error('Redis ping failed:', err.message, err.stack);
+            } else {
+                console.error('Redis ping failed:', String(err));
+            }
         }
-    }, 30000); // Ping every 30s
+    }, 10000); // Ping every 10s
 }
 
 (async () => {
     try {
         await redisClient.connect();
     } catch (error) {
-        console.error('Failed to connect to Redis initially:', error);
+        if (error instanceof Error) {
+            console.error('Failed to connect to Redis initially:', error.message, error.stack);
+        } else {
+            console.error('Failed to connect to Redis initially:', String(error));
+        }
     }
 })();
 
-// Graceful shutdown
 process.on('SIGINT', async () => {
     console.log('Gracefully shutting down...');
     try {
