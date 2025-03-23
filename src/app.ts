@@ -150,7 +150,11 @@ const app = express();
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// Move helmet after Socket.IO to avoid interference with WebSocket/polling
+// Debug route to confirm /socket isn't being handled by Express
+app.get('/socket', (req, res) => {
+  res.status(200).send('This should not be reached; Socket.IO should handle /socket');
+});
+
 if (isProduction) {
   app.use(requireHTTPS);
   app.set('trust proxy', 1);
@@ -159,11 +163,9 @@ if (isProduction) {
   app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
 }
 
-// Initialize server and Socket.IO before other middleware
 const server = http.createServer(app);
 initSocket(server);
 
-// Apply helmet after Socket.IO initialization
 app.use(helmet());
 
 const RedisStore = connectRedis;
@@ -187,7 +189,6 @@ app.use(session(sessionConfig));
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Routes
 app.use('/speck/v1/auth', authRouter);
 
 app.get('/speck/v1/serverHealth', (req, res) => {
@@ -203,7 +204,6 @@ app.get<{}, MessageResponse>('/', jwtAuth, (req, res) => {
 app.use('/speck/v1/roadmap', jwtAuth, roadmapRoute);
 app.use('/speck/v1/user', jwtAuth, userRouter);
 
-// Error handling
 app.use(middlewares.notFound);
 app.use(middlewares.errorHandler);
 
