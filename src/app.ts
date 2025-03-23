@@ -114,7 +114,7 @@ import session from 'express-session';
 import http from 'http';
 import morgan from 'morgan';
 import helmet from 'helmet';
-import connectRedis from 'connect-redis';
+import connectRedis from 'connect-redis'; // Default import
 import { initSocket } from '../utils/socket';
 import { redisClient } from '../utils/client';
 require('dotenv').config();
@@ -160,10 +160,10 @@ if (isProduction) {
 }
 
 // Redis Store for sessions
-const RedisStore = connectRedis(session);
+const RedisStore = connectRedis; // Alias for clarity, no need to call it yet
 
 const sessionConfig: session.SessionOptions = {
-  store: new RedisStore({ client: redisClient }),
+  store: new RedisStore({ client: redisClient }), // Use `new` here
   secret: process.env.SESSION_SECRET || 'your-secret-key',
   resave: false,
   saveUninitialized: false,
