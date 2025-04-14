@@ -27,6 +27,7 @@ jobs:
         run: |
           npm install
           npm run build --if-present
+          echo "DB: $DATABASE_URL"
         env:
           CALLBACK_URL: ${{ secrets.CALLBACK_URL }}
           DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
