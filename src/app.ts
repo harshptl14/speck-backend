@@ -124,6 +124,7 @@ import * as middlewares from './middlewares/middlewares';
 import MessageResponse from './interfaces/MessageResponse';
 import roadmapRoute from './routes/roadmap.route';
 import { authRouter } from './routes/auth.route';
+import mindmapRoutes from './routes/mindmap.route';
 import { useGoogleStrategy } from './configs/auth.config';
 import { jwtAuth } from './middlewares/auth.middlewares';
 import userRouter from './routes/user.route';
@@ -206,6 +207,7 @@ app.get<{}, MessageResponse>('/', jwtAuth, (req, res) => {
 
 app.use('/speck/v1/roadmap', jwtAuth, roadmapRoute);
 app.use('/speck/v1/user', jwtAuth, userRouter);
+app.use('/speck/v1/mindmap', mindmapRoutes); // Added
 
 app.use(middlewares.notFound);
 app.use(middlewares.errorHandler);

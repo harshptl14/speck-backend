@@ -14,10 +14,37 @@ model User {
   roadmaps  Roadmap[]  @relation("UserRoadmaps")
   Progress  Progress[]
   favorites Favorite[]
+  mindmaps  Mindmap[]  @relation("UserMindmaps") // Added
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
   @@index([email])
+}
+
+model Mindmap {
+  id             Int             @id @default(autoincrement())
+  title          String
+  markdown       String
+  userId         Int
+  user           User            @relation("UserMindmaps", fields: [userId], references: [id], onDelete: Cascade)
+  aiChatMessages AIChatMessage[] @relation("MindmapAIChatMessages") // Added relation to AI chat messages
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  originalText   String? // Optional text field for additional information
+
+  @@index([userId])
+}
+
+model AIChatMessage {
+  id        Int      @id @default(autoincrement())
+  mindmapId Int
+  mindmap   Mindmap  @relation("MindmapAIChatMessages", fields: [mindmapId], references: [id], onDelete: Cascade)
+  role      String // "user" or "assistant"
+  content   String // The message content
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([mindmapId])
 }
 
 model Roadmap {

@@ -1,5 +1,5 @@
 import { ChatGroq } from "@langchain/groq";
-import { ChatOpenAI } from "@langchain/openai";
+import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 
 require('dotenv').config();
 
@@ -8,8 +8,10 @@ export const groqModel = new ChatGroq({
     model: "llama-3.3-70b-versatile",
 });
 
-// export const openaiModel = new ChatOpenAI({
-//     apiKey: process.env.OPENAI_API_KEY,
-//     model: "gpt-3.5-turbo-1106",
-// });
-
+// Google ai studio 
+export const geminiModel = new ChatGoogleGenerativeAI({
+    apiKey: process.env.GOOGLE_API_KEY,
+    model: "gemini-2.0-flash-lite",
+    temperature: 0.7,
+    maxOutputTokens: 2048,
+});

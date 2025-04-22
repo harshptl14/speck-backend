@@ -1,15 +1,13 @@
 FROM node:20
 
 # Install pnpm
-RUN npm install -g pnpm
-
 WORKDIR /app
 
 COPY package*.json ./
 
 COPY prisma ./prisma
 
-RUN pnpm install
+RUN npm install
 
 RUN npx prisma generate
 
@@ -19,4 +17,4 @@ EXPOSE 4000
 EXPOSE 8080
 EXPOSE 5555
 
-CMD ["pnpm", "run", "dev", "--inspect"]
+CMD ["npm", "run", "dev", "--inspect"]
