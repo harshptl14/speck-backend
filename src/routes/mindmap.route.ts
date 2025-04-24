@@ -27,6 +27,7 @@ import {
     listMindmapsController,
     saveAIChatMessageController,
     getAIChatMessagesController,
+    getRoadmapsInfoByUserIdController
 } from '../controllers/mindmap.controller';
 import { jwtAuth } from '../middlewares/auth.middlewares';
 
@@ -55,5 +56,8 @@ router.get('/:id', jwtAuth, getMindmapController);
 
 // List all user's mindmaps
 router.get('/', jwtAuth, listMindmapsController);
+
+// Get mindmap infos by userId (dummy response for testing)
+router.get('/:id/gethomemindmapdata', jwtAuth, getRoadmapsInfoByUserIdController);
 
 export default router;

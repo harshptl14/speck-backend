@@ -11,7 +11,7 @@ router.post('/sendCoursetitle', getRoadmapTitle);
 router.post('/sendRoadmapOutline', getRoadmapTitle);
 router.get('/getTopicsById/:id', getTopicsById);
 router.get('/getSubTopicById/:id', getSubTopicById);
-router.get('/getRoadmapsInfoByUserId/:id', getRoadmapsInfoByUserId)
+router.get('/getRoadmapsInfoByUserId/:id', getRoadmapsInfoByUserId);
 router.post('/generateSubtopicContent', createSubtopicContent);
 router.get('/subtopicGenerationProgress/:jobId', getSubtopicGenerationProgress);
 router.post('/updateSubtopicCompletion', updateSubtopicCompletion);

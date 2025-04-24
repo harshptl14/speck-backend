@@ -183,39 +183,49 @@ export const getSubTopicByIdService = async (subtopicId: number) => {
 
 export const getRoadmapsInfoByUserIdService = async (userId: number) => {
     try {
-        const userRoadmaps = await prisma.roadmap.findMany({
+        console.log('Fetching roadmaps for userId:', userId);
+
+        // Get all roadmaps for total count
+        const allRoadmaps = await prisma.roadmap.findMany({
+            where: { userId },
+            select: { id: true }
+        });
+        const totalRoadmapIds = allRoadmaps.map(roadmap => ({ id: roadmap.id }));
+
+        // Get all completed roadmaps
+        const completedRoadmaps = await prisma.progress.findMany({
             where: {
-                userId: userId
+                userId,
+                topicId: 0,
+                subtopicId: 0,
+                status: 'COMPLETED'
             },
+            select: { roadmapId: true },
+            distinct: ['roadmapId']
+        });
+        const completedRoadmapIds = completedRoadmaps.map(p => ({ roadmapId: p.roadmapId }));
+
+        // Get all favorite roadmaps
+        const favoriteRoadmapIds = await prisma.favorite.findMany({
+            where: { userId },
+            select: { roadmapId: true }
+        });
+
+        // Get only 3 most recent roadmaps for display
+        const recentRoadmaps = await prisma.roadmap.findMany({
+            where: { userId },
             select: {
                 id: true,
                 name: true,
                 progress: {
-                    select: {
-                        status: true
-                    }
+                    select: { status: true }
                 }
-            }
-        });
-        const totalRoadmapIds = userRoadmaps.map(roadmap => ({ id: roadmap.id }));
-
-        const completedRoadmapIds = userRoadmaps
-            .filter(roadmap =>
-                roadmap.progress.length > 0 &&
-                roadmap.progress.every(p => p.status === 'COMPLETED')
-            )
-            .map(roadmap => ({ roadmapId: roadmap.id }));
-
-        const favoriteRoadmapIds = await prisma.favorite.findMany({
-            where: {
-                userId: userId,
             },
-            select: {
-                roadmapId: true,
-            },
+            orderBy: { updatedAt: 'desc' },
+            take: 3
         });
 
-        const courses = userRoadmaps.map(roadmap => {
+        const courses = recentRoadmaps.map(roadmap => {
             const completedTopics = roadmap.progress.filter(p => p.status === 'COMPLETED').length;
             const totalTopics = roadmap.progress.length;
             const progress = totalTopics > 0 ? Math.round((completedTopics / totalTopics) * 100) : 0;
@@ -266,6 +276,12 @@ export const updateSubtopicCompletionService = async (
                     subtopicId,
                     status: newStatus,
                 },
+            });
+
+            // Update the roadmap to trigger the @updatedAt functionality
+            await tx.roadmap.update({
+                where: { id: roadmapId },
+                data: { updatedAt: new Date() },
             });
 
             if (newStatus === ProgressStatus.COMPLETED) {

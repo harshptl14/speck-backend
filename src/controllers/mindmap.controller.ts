@@ -7,7 +7,8 @@ import {
     getMindmap,
     listMindmaps,
     saveAIChatMessage,
-    getAIChatMessages
+    getAIChatMessages,
+    getRoadmapsInfoByUserId
 } from '../services/mindmap.service/mindmap.service';
 import { ApiError } from '../../utils/ApiError';
 
@@ -211,3 +212,25 @@ export const getAIChatMessagesController = async (
         next(error);
     }
 };
+
+export const getRoadmapsInfoByUserIdController = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        const user = req.user as User;
+
+        if (!user?.id) throw ApiError(401, 'Unauthorized');
+
+        const roadmapsInfo = await getRoadmapsInfoByUserId(user.id);
+
+        res.status(200).json({
+            message: 'Roadmaps info fetched successfully',
+            roadmapsInfo,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+

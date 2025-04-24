@@ -94,7 +94,10 @@ export const directUpdateMarkdown = async (
         // Update mindmap with direct markdown
         await prisma.mindmap.update({
             where: { id: mindmapId },
-            data: { markdown: markdownText },
+            data: {
+                markdown: markdownText,
+                updatedAt: new Date(),
+            },
         });
 
         return markdownText;
@@ -201,6 +204,7 @@ export const saveAIChatMessage = async (
                 mindmapId,
                 role,
                 content,
+                createdAt: new Date(),
             },
         });
     } catch (error) {
@@ -299,11 +303,16 @@ export const createMindmap = async (
             const titleMatch = content.match(/"title":\s*"([^"]+)"/);
             const markdownMatch = content.match(/"markdown":\s*"([^"]+)"/);
             title = providedTitle || titleMatch?.[1] || "Untitled Mindmap";
+            console.log("Extracted title:========>", title);
             markdown = markdownMatch?.[1]?.replace(/\\n/g, "\n") || "Default markdown";
         }
 
         const mindmap = await prisma.mindmap.create({
-            data: { title, markdown, userId, originalText: inputText },
+            data: {
+                title, markdown, userId, originalText: inputText,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
         });
 
         return { markdown, id: mindmap.id, title };
@@ -403,5 +412,38 @@ export const listMindmaps = async (
         return mindmaps;
     } catch (error) {
         throw ApiError(500, 'Failed to fetch mindmaps');
+    }
+};
+
+export const getRoadmapsInfoByUserId = async (
+    userId: number
+): Promise<{
+    totalMindmaps: number;
+    latestMindmaps: { id: number; title: string; createdAt: Date }[];
+}> => {
+    try {
+        const totalMindmaps = await prisma.mindmap.count({
+            where: { userId },
+        });
+
+        const latestMindmaps = await prisma.mindmap.findMany({
+            where: { userId },
+            orderBy: {
+                updatedAt: 'desc',
+            },
+            take: 5,
+            select: {
+                id: true,
+                title: true,
+                createdAt: true,
+            },
+        });
+
+        return {
+            totalMindmaps,
+            latestMindmaps,
+        };
+    } catch (error) {
+        throw ApiError(500, 'Failed to fetch roadmaps info');
     }
 };
