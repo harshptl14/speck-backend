@@ -26,13 +26,13 @@ export const createMindmapController = async (
     next: NextFunction
 ) => {
     try {
-        const { inputText, title, modelId } = req.body;
+        const { inputText, providedTitle, modelId } = req.body;
         const user = req.user as User;
 
         if (!user?.id) throw ApiError(401, 'Unauthorized');
         if (!inputText) throw ApiError(400, 'Input text is required');
 
-        const { markdown, id, title: finalTitle } = await createMindmap(user.id, inputText, title, modelId);
+        const { markdown, id, title: finalTitle } = await createMindmap(user.id, inputText, providedTitle, modelId);
 
         res.status(201).json({
             message: 'Mindmap created successfully',

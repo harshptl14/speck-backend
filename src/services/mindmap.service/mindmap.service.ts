@@ -23,18 +23,70 @@ interface MindmapResponse {
 // Return the structured Markdown content only.
 // `);
 
+// const structurePrompt = PromptTemplate.fromTemplate(`
+// Convert the following messy text into a clean, hierarchical Markdown format suitable for a Markmap mind map and parseable into a roadmap with topics and subtopics.
+
+// First, identify a concise, descriptive title for the overall content if none is provided.
+
+// Messy Text:
+// {inputText}
+
+// Respond in JSON format:
+// {{
+//   "title": "Your identified title here",
+//   "markdown": "# Your identified title here\\n## Topic 1\\n- Subtopic 1.1\\n- Subtopic 1.2\\n## Topic 2\\n- Subtopic 2.1"
+// }}
+// `);
+
+// const structurePrompt = PromptTemplate.fromTemplate(`
+// Convert the following messy text into a hierarchical Markdown format optimized for a Markmap mind map that balances clarity and descriptive detail.
+
+// Mind Map Content Guidelines:
+// 1. CENTRAL TOPIC: Create a clear, descriptive title (2-7 words)
+// 2. PRIMARY STRUCTURE: Extract 4-7 key topics as main branches
+// 3. HIERARCHY: Organize with clear parent-child relationships (max 3-4 levels deep)
+// 4. DESCRIPTIVE NODES: Use informative phrases (3-10 words per node) that capture key concepts
+// 5. CONTEXT: Include brief explanatory phrases where needed for clarity
+// 6. BALANCE: Develop branches with appropriate detail based on importance
+// 7. COVERAGE: Include enough detail to make the mind map informative and useful
+// 8. ORGANIZATION: Group related concepts under meaningful categories
+
+// Messy Text: {inputText}
+
+// Respond in JSON format:
+// {{
+//   "title": "Descriptive Central Topic",
+//   "markdown": "# Descriptive Central Topic\\n## Key Topic 1 with Context\\n- Subtopic 1.1 with brief explanation\\n- Subtopic 1.2 with important details\\n### Sub-subtopic 1.2.1 with specific information\\n## Key Topic 2 with Context\\n- Subtopic 2.1 with necessary details"
+// }}
+// `);
+
 const structurePrompt = PromptTemplate.fromTemplate(`
-Convert the following messy text into a clean, hierarchical Markdown format suitable for a Markmap mind map and parseable into a roadmap with topics and subtopics.
+Transform the provided messy, unstructured text into a hierarchical Markdown format optimized for a Markmap mind map. The output must be clear, concise, and visually balanced, adhering to the following guidelines:
 
-First, identify a concise, descriptive title for the overall content if none is provided.
+### Mind Map Content Guidelines:
+1. **Central Topic**: Craft a concise, descriptive title (2-7 words) that encapsulates the core theme of the input text.
+2. **Primary Structure**: Identify 4-7 key topics as main branches, each representing a major concept or category.
+3. **Hierarchy**: Organize content with clear parent-child relationships, limiting the depth to 3-4 levels to maintain readability.
+4. **Descriptive Nodes**: Use informative, concise phrases (3-10 words per node) that capture essential concepts or details.
+5. **Context**: Include brief explanatory phrases (1-2 sentences) for nodes where additional clarity is needed, especially for complex or ambiguous concepts.
+6. **Balance**: Ensure branches are developed with proportional detail based on their importance, avoiding overly dense or sparse sections.
+7. **Coverage**: Provide sufficient detail to make the mind map informative and useful, while avoiding unnecessary elaboration.
+8. **Organization**: Group related concepts under meaningful categories to enhance logical flow and coherence.
 
-Messy Text:
+### Additional Instructions:
+- **Input Handling**: If the input text is vague, incomplete, or overly complex, infer the most logical structure based on implied themes and prioritize clarity.
+- **Markdown Formatting**: Use proper Markdown syntax (e.g., '#', '##', '-', '###') for hierarchy. Ensure consistent indentation and formatting.
+- **Edge Cases**: If the input lacks sufficient content for 4 main branches, create as many meaningful branches as possible (minimum 3). If the input is too broad, prioritize the most impactful topics.
+- **Conciseness**: Avoid redundancy in node descriptions; each node should add unique value to the mind map.
+- **Output Format**: Return the result in JSON format with two keys: 'title' (the central topic) and 'markdown' (the hierarchical Markdown content). The Markdown should be escaped properly for JSON (e.g., use '\\n' for newlines).
+
+### Input Text:
 {inputText}
 
-Respond in JSON format:
+### Expected Output Format:
 {{
-  "title": "Your identified title here",
-  "markdown": "# Your identified title here\\n## Topic 1\\n- Subtopic 1.1\\n- Subtopic 1.2\\n## Topic 2\\n- Subtopic 2.1"
+  "title": "Descriptive Central Topic",
+  "markdown": "# Descriptive Central Topic\\n## Key Topic 1 with Context\\n- Subtopic 1.1 with brief explanation\\n- Subtopic 1.2 with important details\\n### Sub-subtopic 1.2.1 with specific information\\n## Key Topic 2 with Context\\n- Subtopic 2.1 with necessary details"
 }}
 `);
 
@@ -256,6 +308,9 @@ export const createMindmap = async (
     providedTitle?: string,
     modelId: string = "groq:llama-3.3"
 ): Promise<{ markdown: string; id: number; title: string }> => {
+
+    console.log(providedTitle, "provided title");
+
     try {
         // Robust validation of inputText
         if (typeof inputText !== 'string' || !inputText.trim()) {
@@ -269,17 +324,8 @@ export const createMindmap = async (
             throw ApiError(400, `Input is too long for model ${modelId}. Estimated ${estimatedTokens} tokens, but limit is ${tokenLimit}.`);
         }
 
-        // Log inputText for debugging
-        console.log("Creating mindmap with inputText:", {
-            inputText,
-            inputTextLength: inputText.length,
-            modelId,
-            userId,
-        });
-
         // Format the prompt
         const prompt = await structurePrompt.format({ inputText });
-        console.log("Formatted prompt:", prompt); // Log the formatted prompt
 
         const model = getModelById(modelId);
         const response = await model.invoke(prompt, {
@@ -296,6 +342,8 @@ export const createMindmap = async (
                 throw new Error("Invalid response: missing title or markdown");
             }
             title = providedTitle || parsedResponse.title;
+            console.log("provided title:", providedTitle)
+            console.log("parsed title:", parsedResponse.title)
             markdown = parsedResponse.markdown;
         } catch (parseError) {
             console.error("Response parsing error:", parseError, { content: response.content });
@@ -303,7 +351,6 @@ export const createMindmap = async (
             const titleMatch = content.match(/"title":\s*"([^"]+)"/);
             const markdownMatch = content.match(/"markdown":\s*"([^"]+)"/);
             title = providedTitle || titleMatch?.[1] || "Untitled Mindmap";
-            console.log("Extracted title:========>", title);
             markdown = markdownMatch?.[1]?.replace(/\\n/g, "\n") || "Default markdown";
         }
 
