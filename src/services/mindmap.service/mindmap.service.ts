@@ -318,10 +318,13 @@ export const createMindmap = async (
         }
 
         const estimatedTokens = estimateTokenCount(inputText);
+
         const tokenLimit = modelTokenLimits[modelId] || 8192;
 
         if (estimatedTokens > tokenLimit) {
-            throw ApiError(400, `Input is too long for model ${modelId}. Estimated ${estimatedTokens} tokens, but limit is ${tokenLimit}.`);
+            throw ApiError(400, `
+                Input is too long. Could you please try to shorten it? Maybe under 40000 characters?
+                `);
         }
 
         // Format the prompt
@@ -372,7 +375,7 @@ export const createMindmap = async (
             inputTextLength: inputText?.length || 0,
             inputText: inputText || "undefined",
         });
-        throw ApiError(500, `Failed to create mindmap: ${error.message}`);
+        throw ApiError(error.statusCode, `Failed to create mindmap: ${error.message}`);
     }
 };
 

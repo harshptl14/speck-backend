@@ -47,8 +47,8 @@ export const getModelById = (modelId: string) => {
 };
 
 export const modelTokenLimits: Record<string, number> = {
-    "groq:llama-3.3": 8192,
-    "gemini:flash": 8192,
+    "groq:llama-3.3": 6250,
+    "gemini:flash": 8750,
     "gemini:pro": 32768,
     "openai:gpt-4": 128000,
 };
